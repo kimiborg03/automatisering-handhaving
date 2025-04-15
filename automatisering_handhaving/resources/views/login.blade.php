@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Login</title>
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>
     @auth
