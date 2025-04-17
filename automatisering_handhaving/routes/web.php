@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MatchController;
+
+Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 
 // GET route for login page
 Route::get('/login', function () {
@@ -21,6 +24,4 @@ Route::get('/home', function () {
     return view('home');
 })->middleware('auth');
 
-Route::get('/add-match', function () {
-    return view('add-match');
-})->name('add-match');
+Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');

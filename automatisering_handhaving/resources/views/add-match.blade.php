@@ -1,51 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 
-<body>
-    <div class="loginform">
-        <form action="" method="POST">
-            @csrf
-            <label for="name-match">Naam wedstrijd</label>
-            <input type="text" name="name-match" id="name-match" required>
-            <label for="location">Locatie</label>
-            <input type="text" name="location" id="location" required>
-            <label for="date">Datum</label>
-            <input type="date" name="date" id="date" required>
-            <label for="check-in-time">Verzamelen tijdstip</label>
-            <input type="time" name="check-in-time" id="check-in-time" required>
-            <label for="kick-off-time">Aftrap tijdstip</label>
-            <input type="time" name="kick-off-time" id="kick-off-time" required>
-            <label for="category">Categorie</label>
-            <input type="text" name="category" id="category" required>
-            <label for="groups">Klas</label><br>
-            <select name="groups[]" id="groups" multiple size="4">
-                <option value="optie1">Klas 1</option>
-                <option value="optie2">Klas 2</option>
-                <option value="optie3">Klas 3</option>
-                <option value="optie4">Klas 4</option>
-            </select>
-            <label for="Limit">Aantal</label>
-            <input type="number" id="Limit" name="Limit">
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Wedstrijd Toevoegen</h3>
+                        <form action="{{ route('matches.store') }}" method="POST">
+                            @csrf
+<div class="mb-3">
+    <label for="name-match" class="form-label">Naam wedstrijd</label>
+    <input type="text" class="form-control" name="name-match" id="name-match" required>
+</div>
 
+<div class="mb-3">
+    <label for="location" class="form-label">Locatie</label>
+    <input type="text" class="form-control" name="location" id="location" required>
+</div>
 
-            <label for="extraCheckbox">
-                <input type="checkbox" id="extraCheckbox"> Andere deadline (by default 3 dagen van te voren)
-            </label>
+<div class="mb-3">
+    <label for="date" class="form-label">Datum</label>
+    <input type="date" class="form-control" name="date" id="date" required>
+</div>
 
-            <div id="extraInputContainer" style="display: none; margin-top: 10px;">
-                <label for="deadline">Deadline</label>
-                <input type="datetime-local" id="deadline" name="deadline">
-            </div>
-            <button type="submit">Inloggen</button>
+<div class="mb-3">
+    <label for="check-in-time" class="form-label">Verzamelen tijdstip</label>
+    <input type="time" class="form-control" name="check-in-time" id="check-in-time" required>
+</div>
 
-        </form>
+<div class="mb-3">
+    <label for="kick-off-time" class="form-label">Aftrap tijdstip</label>
+    <input type="time" class="form-control" name="kick-off-time" id="kick-off-time" required>
+</div>
+
+<div class="mb-3">
+    <label for="category" class="form-label">Categorie</label>
+    <input type="text" class="form-control" name="category" id="category" required>
+</div>
+
+<div class="mb-3">
+    <label for="groups" class="form-label">Klas</label>
+    <select name="groups[]" id="groups" class="form-select" multiple size="4">
+        @foreach ($groups as $group)
+            <option value="{{ $group->id }}">{{ $group->name }}</option>
+        @endforeach
+    </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Limit" class="form-label">Aantal</label>
+                                <input type="number" class="form-control" id="Limit" name="Limit">
+                            </div>
+
+                            <div id="extraInputContainer" class="mb-3">
+                                <label for="deadline" class="form-label">Deadline</label>
+                                <input type="datetime-local" class="form-control" id="deadline" name="deadline">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Opmerking</label>
+                                <textarea type="text" class="form-control" name="comment" id="comment"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Wedstrijd toevoegen</button>
+                        </form>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 
     <script>
         const checkbox = document.getElementById('extraCheckbox');
@@ -54,8 +90,7 @@
         checkbox.addEventListener('change', () => {
             container.style.display = checkbox.checked ? 'block' : 'none';
         });
-    </script>
-
+</script>
 </body>
 
 </html>
