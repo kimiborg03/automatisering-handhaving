@@ -8,6 +8,7 @@ Route::get('/login', function () {
     return view('login');
 })->name('login');
 
+// Route::post('/login', [AuthController::class, 'login']);
 
 // POST route for /login
 Route::post('/login', [AuthController::class, 'login']);
@@ -19,3 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/home', function () {
     return view('home');
 })->middleware('auth');
+
+Route::get('/add-match', function () {
+    return view('add-match');
+})->name('add-match');
