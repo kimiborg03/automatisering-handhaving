@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MatchController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegisterMail;
@@ -10,7 +11,6 @@ use App\Mail\RegisterMail;
 Route::get('/login', function () {
     return view('login');
 })->name('login');
-
 
 // POST route for /login
 Route::post('/login', [AuthController::class, 'login']);
@@ -37,3 +37,7 @@ Route::get('/test-email', function () {
 
     return 'Test email sent!';
 });
+
+// Match routes
+Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');

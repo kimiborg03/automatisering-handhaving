@@ -17,7 +17,7 @@ class AuthController extends Controller
             return redirect()->intended('/home');
         }
         // incase of a failed login
-        return back()->withErrors([
+        return back()->withErrors(provider: [
             'email' => 'De opgegeven inloggegevens zijn onjuist.',
         ]);
     }
