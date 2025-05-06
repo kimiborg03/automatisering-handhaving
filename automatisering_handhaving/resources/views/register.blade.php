@@ -1,17 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registreren</title>
-    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
-</head>
-<body>
+@extends('layouts.app')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/register.css') }}">
+@endpush
+
+@section('title', 'Registreren')
+
+@section('content')
+    <h1>Registratieformulier</h1>
 
     @if(session('success'))
         <p style="color: green">{{ session('success') }}</p>
     @endif
-    {{-- form for registering a new user --}}
+
+    {{-- Formulier voor registratie --}}
     <form method="POST" action="{{ route('register') }}">
-        <h1>Registratieformulier</h1>
         @csrf
         <label for="name">Volledige naam:</label>
         <input type="text" name="name" required><br>
@@ -34,9 +37,7 @@
             <option value="gebruiker">Gebruiker</option>
             <option value="admin">Admin</option>
         </select><br>
-        
 
         <button type="submit">Account aanmaken</button>
     </form>
-</body>
-</html>
+@endsection
