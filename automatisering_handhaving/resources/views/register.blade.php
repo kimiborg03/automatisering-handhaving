@@ -7,15 +7,23 @@
 @section('title', 'Registreren')
 
 @section('content')
-    <h1>Registratieformulier</h1>
 
-    @if(session('success'))
-        <p style="color: green">{{ session('success') }}</p>
-    @endif
 
-    {{-- Formulier voor registratie --}}
+    {{-- Form for registration--}}
+<div class="registerform">
     <form method="POST" action="{{ route('register') }}">
+        <h1>Registratieformulier</h1>
         @csrf
+        {{-- show errors --}}
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li class="error">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
         <label for="name">Volledige naam:</label>
         <input type="text" name="name" required><br>
 
@@ -38,6 +46,7 @@
             <option value="admin">Admin</option>
         </select><br>
 
-        <button type="submit">Account aanmaken</button>
+        <button type="submit" class="registerbutton">Account aanmaken</button>
     </form>
+</div>
 @endsection

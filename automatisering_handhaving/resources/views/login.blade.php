@@ -13,7 +13,7 @@
             <!-- Log out button in case user is logged in -->
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit">Uitloggen</button>
+                <button type="submit" class="loginbutton">Uitloggen</button>
             </form>
         @else
             <!-- Login form -->
@@ -23,7 +23,7 @@
                 <input type="email" name="email" id="email" required>
                 <label for="password">Wachtwoord:</label>
                 <input type="password" name="password" id="password" required>
-                <button type="submit">Inloggen</button>
+                <button type="submit" class="loginbutton">Inloggen</button>
             </form>
         @endauth
     </div>
