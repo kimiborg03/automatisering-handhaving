@@ -22,7 +22,7 @@
         </li>
         {{-- talland logo --}}
         <li>
-            <a href="{{ url('/') }}">
+            <a href="{{ url('/home') }}">
                 <img src="{{ asset('images/tallandlogo.png') }}" alt="Talland Logo" style="height: 40px;">
             </a>
         </li>
