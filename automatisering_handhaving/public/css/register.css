@@ -7,7 +7,7 @@
     height: 100vh;
     margin: 0;
 }
-
+/* styling for the register form */
 .registerform {
     background: #ffffff;
     padding: 50px;
@@ -45,7 +45,7 @@ p {
     text-align: center;
     color: green;
 }
-
+/* styling for the error message */
 .error {
     color: red;
     text-align: center;
