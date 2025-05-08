@@ -56,6 +56,39 @@ $matches = \App\Models\Matches::whereJsonContains('users', ['id' => $userId])->g
             </div>
         </div>
     </div>
+    <!-- Second Modal: Swap Match -->
+    <div class="modal fade" id="swapModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">Wedstrijd Ruilen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                </div>
+                <div class="modal-body" id="swap-modal-body">
+                    <!-- Content will be filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Modal (Confirmation) -->
+    <div class="modal fade" id="thirdModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">Actie Bevestigen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Weet je zeker dat je deze actie wilt voltooien?</p>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmAction()">Ja, bevestigen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         function openMatchModal(match) {
             let matchUsers = Array.isArray(match.users) ? match.users : JSON.parse(match.users);
@@ -80,8 +113,42 @@ $matches = \App\Models\Matches::whereJsonContains('users', ['id' => $userId])->g
         <p><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
         <p><strong>Category:</strong> ${match.category}</p>
         <p><strong>Ingeschreven:</strong> ${numberOfUsers} / ${match.limit}</p>
+         
+<button class="btn btn-outline-warning btn-sm w-100 mt-2"
+    data-bs-toggle="modal"
+    data-bs-target="#swapModal"
+    onclick='openSwapModal(${JSON.stringify(match)})'>
+    Wedstrijd Ruilen
+</button>
     `;
         }
+        function openSwapModal(currentMatch) {
+            const allMatches = @json($allMatches);
+
+            const body = document.getElementById('swap-modal-body');
+            body.innerHTML = '';
+
+            allMatches.forEach(match => {
+                if (match.id !== currentMatch.id) {
+                    body.innerHTML += `
+                <div class="card mb-2">
+                    <div class="card-body p-2">
+                        <strong>${match.name}</strong><br>
+                        Locatie: ${match.location}<br>
+                        Tijd: ${new Date(match.kickoff_time).toLocaleTimeString()}
+                        <button class="btn btn-sm btn-outline-success mt-2">Kies</button>
+                    </div>
+                </div>
+            `;
+                }
+            });
+        }
+
+        function confirmAction() {
+            console.log("Actie bevestigd!");
+            bootstrap.Modal.getInstance(document.getElementById('thirdModal')).hide();
+        }
+
 
     </script>
 </body>

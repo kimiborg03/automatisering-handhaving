@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MatchController;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Matches;
 
 Route::get('/matches', [MatchController::class, 'store'])->name('matches.store');
 use App\Http\Controllers\RegisterController;
@@ -24,9 +25,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Route for home, only available for logged in users
 Route::get('/home', function () {
     $userId = Auth::id(); // Same result
+    $allMatches = Matches::all();
+
     // or: $userId = auth()->user()->id;
 
-    return view('home', compact('userId'));
+    return view('home', compact('userId', 'allMatches'));
 })->middleware('auth');
 
 // routes for register
