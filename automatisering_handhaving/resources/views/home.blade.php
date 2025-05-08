@@ -1,15 +1,18 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+@endpush
+
 @section('title', 'home')
 
 @section('content')
 
-<body class="bg-light">
-    <div class="container mt-4">
-        <h3 class="mb-4">Aangemelde Wedstrijden</h3>
+<div class="container mt-4 bg-light rounded p-4">
+        <h2 class="mb-4 text-center fw-bold">Aangemelde Wedstrijden</h3>
 
         <?php
-$matches = \App\Models\Matches::whereJsonContains('users', ['id' => $userId])->get();
+        $matches = \App\Models\Matches::whereJsonContains('users', ['id' => $userId])->get();
         ?>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
@@ -143,7 +146,6 @@ $matches = \App\Models\Matches::whereJsonContains('users', ['id' => $userId])->g
 
 
     </script>
-</body>
 @endsection
 
 </html>
