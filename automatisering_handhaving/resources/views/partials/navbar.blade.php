@@ -30,10 +30,10 @@
         <li class="dropdown">
             <a href="#" class="dropdown-toggle">Wedstrijden</a>
             <ul class="dropdown-menu">
-                <li><a href="{{ url('') }}">AZ Alkmaar</a></li>
-                <li><a href="{{ url('') }}">AZ Vrouwen</a></li>
-                <li><a href="{{ url('') }}">Jong AZ</a></li>
-                <li><a href="{{ url('') }}">Overige</a></li>
+                <li><a href="{{ route('category.show', 'AZ-Alkmaar') }}">AZ-Alkmaar</a></li>
+                <li><a href="{{ route('category.show', 'AZ-Vrouwen') }}">AZ-Vrouwen</a></li>
+                <li><a href="{{ route('category.show', 'Jong-AZ') }}">Jong-AZ</a></li>
+                <li><a href="{{ route('category.show', 'Overige') }}">Overige</a></li>
             </ul>
         </li>
     </ul>

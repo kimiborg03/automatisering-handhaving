@@ -6,6 +6,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegisterMail;
+use App\Http\Controllers\CategoryController;
 
 // GET route for login page
 Route::get('/login', function () {
@@ -41,3 +42,6 @@ Route::get('/test-email', function () {
 // Match routes
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
+
+// Category routes
+Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
