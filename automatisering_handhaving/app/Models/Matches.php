@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Matches extends Model
 {
+    protected $casts = [
+        'checkin_time' => 'datetime',
+        'kickoff_time' => 'datetime',
+        // add others like 'deadline' if needed
+    ];
     protected $fillable = [
         'name',
         'location',
