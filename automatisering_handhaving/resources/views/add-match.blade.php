@@ -47,8 +47,8 @@
     <label for="category" class="form-label">Categorie</label>
     <select class="form-select" name="category" id="category" required>
         <option value="">-- Selecteer een categorie --</option>
-        <option value="AZ Alkmaar">AZ Alkmaar</option>
-        <option value="Jong AZ">Jong AZ</option>
+        <option value="AZ-Alkmaar">AZ-Alkmaar</option>
+        <option value="Jong-AZ">Jong-AZ</option>
         <option value="AZ-Vrouwen">AZ-Vrouwen</option>
         <option value="Overige">Overige</option>
     </select>

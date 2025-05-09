@@ -15,7 +15,7 @@
         }
     </style>
     @stack('styles')
- 
+    @stack('scripts')
 </head>
 <body>
     {{-- Include the navbar --}}

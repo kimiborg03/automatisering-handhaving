@@ -1,34 +1,28 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/category.css') }}">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('js/category.js') }}"></script>
+@endpush
+
 @section('title', 'Wedstrijden - ' . $category)
 
 @section('content')
-    <h1>Wedstrijden in de categorie: {{ $category }}</h1>
+<div class="container mt-4 bg-light rounded p-4">
+    <meta name="category" content="{{ $category }}">
+    <h2 class="mb-4 text-center fw-bold">Wedstrijden voor {{ $category }}</h2>
 
-    @if($matches->isEmpty())
-        <p>Er zijn geen wedstrijden in deze categorie.</p>
-    @else
-        <table>
-            <thead>
-                <tr>
-                    <th>Naam</th>
-                    <th>Locatie</th>
-                    <th>Check-in Tijd</th>
-                    <th>Kick-off Tijd</th>
-                    <th>Limiet</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($matches as $match)
-                    <tr>
-                        <td>{{ $match->name }}</td>
-                        <td>{{ $match->location }}</td>
-                        <td>{{ $match->checkin_time }}</td>
-                        <td>{{ $match->kickoff_time }}</td>
-                        <td>{{ $match->limit }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
+    <div id="matches-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+        <!-- matches appear here -->
+    </div>
+
+    <div class="text-center mt-4">
+        <button id="load-more" class="btn btn-primary">Meer wedstrijden</button>
+        <p id="no-more" class="text-muted d-none">Geen wedstrijden meer</p>
+    </div>
+</div>
+
 @endsection
