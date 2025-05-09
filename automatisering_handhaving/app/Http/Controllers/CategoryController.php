@@ -18,6 +18,7 @@ class CategoryController extends Controller
     
         $matches = Matches::where('category', $category)
         // load the matches  based on check in time
+        ->where('checkin_time', '>=', now())
         ->orderBy('checkin_time', 'asc')
         ->offset($offset)
         ->limit(12)
