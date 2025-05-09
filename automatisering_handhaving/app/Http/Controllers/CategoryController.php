@@ -8,11 +8,22 @@ class CategoryController extends Controller
 {
     public function show($category)
     {
-
-        // Retrieve matches that belong to the category
-        $matches = Matches::where('category', $category)->get();
-    
-        // Return the category blade with the matches
-        return view('category', compact('matches', 'category'));
+        return view('category', compact('category'));
     }
+    
+    public function loadMatches(Request $request)
+    {
+        $category = $request->input('category');
+        $offset = $request->input('offset', 0);
+    
+        $matches = Matches::where('category', $category)
+        // load the matches  based on check in time
+        ->orderBy('checkin_time', 'asc')
+        ->offset($offset)
+        ->limit(12)
+        ->get();
+    
+        return response()->json($matches);
+    }
+    
 }

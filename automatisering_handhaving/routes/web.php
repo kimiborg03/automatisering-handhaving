@@ -54,3 +54,4 @@ Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
 
 // Category routes
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
