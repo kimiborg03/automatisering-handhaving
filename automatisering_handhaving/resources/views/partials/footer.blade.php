@@ -7,8 +7,6 @@
         background-color: #f4f4f9;
         text-align: center;
         padding: 10px;
-        position: fixed;
-        bottom: 0;
         width: 100%;
         border-top: 1px solid #ccc;
     }

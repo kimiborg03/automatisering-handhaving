@@ -55,3 +55,10 @@ Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
 // Category routes
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
 Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
+
+// admin page
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', function () {
+        return view('admin.admin');
+    });
+});
