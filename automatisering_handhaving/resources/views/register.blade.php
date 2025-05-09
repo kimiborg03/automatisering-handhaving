@@ -58,6 +58,7 @@
         {{-- register button --}}
         <button type="submit" class="registerbutton">Account aanmaken</button>
     </form>
+    {{-- Back button --}}
     <a href="{{ url('/admin') }}" class="btn btn-secondary back-button">
         <i class="bi bi-arrow-return-left"></i> Terug naar Admin paneel
     </a>
