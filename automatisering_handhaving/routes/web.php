@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MatchController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Matches;
@@ -22,19 +23,15 @@ Route::post('/login', [AuthController::class, 'login']);
 // POST route for /logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route for home, only available for logged in users
-Route::get('/home', function () {
-    $userId = Auth::id(); // Same result
-    $allMatches = Matches::all();
+// // Route for home, only available for logged in users
+// Route::get('/home', function () {
 
-    // or: $userId = auth()->user()->id;
-
-    return view('home', compact('userId', 'allMatches'));
-})->middleware('auth');
+// })->middleware('auth');
 
 // routes for register
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+Route::get('/home', [HomeController::class, 'index'])->middleware('auth');;
 
 Route::get('/test-email', function () {
     $user = (object) [
@@ -50,3 +47,5 @@ Route::get('/test-email', function () {
 // Match routes
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
+Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
+Route::post('/match/{matchId}/update', [MatchController::class, 'updateMatch']);
