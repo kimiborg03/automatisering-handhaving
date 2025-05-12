@@ -8,9 +8,15 @@
 
 @section('content')
 
-
     {{-- Form for registration--}}
 <div class="registerform">
+        {{-- Success message --}}
+        @if (session('success'))
+        <div class="success-message">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('register') }}">
         <h1>Registratieformulier</h1>
         @csrf
@@ -23,6 +29,9 @@
                 @endforeach
             </ul>
         </div>
+    @endif
+    @if (request('success'))
+    <p class="success-message">Gebruiker succesvol geregistreerd!</p>
     @endif
         {{-- field for name --}}
         <label for="name">Volledige naam:</label>
@@ -49,5 +58,9 @@
         {{-- register button --}}
         <button type="submit" class="registerbutton">Account aanmaken</button>
     </form>
+    {{-- Back button --}}
+    <a href="{{ url('/admin') }}" class="btn btn-secondary back-button">
+        <i class="bi bi-arrow-return-left"></i> Terug naar Admin paneel
+    </a>
 </div>
 @endsection

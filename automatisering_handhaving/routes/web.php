@@ -33,9 +33,6 @@ Route::get('/home', function () {
     return view('home', compact('userId', 'allMatches'));
 })->middleware('auth');
 
-// routes for register
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
 
 Route::get('/test-email', function () {
     $user = (object) [
@@ -55,3 +52,11 @@ Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
 // Category routes
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
 Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
+
+// admin page
+Route::middleware(['auth', 'admin'])->group(function () {
+Route::get('/admin', function () {return view('admin.admin');});
+    // routes for register
+Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/admin/register', [RegisterController::class, 'register']);
+});
