@@ -1,39 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MatchController;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Matches;
-
-Route::get('/matches', [MatchController::class, 'store'])->name('matches.store');
-use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\RegisterMail;
-use App\Http\Controllers\CategoryController;
 
-// GET route for login page
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\CategoryController;
+use App\Mail\RegisterMail;
+
+// Login routes
 Route::get('/login', function () {
     return view('login');
 })->name('login');
 
-// POST route for /login
 Route::post('/login', [AuthController::class, 'login']);
-
-// POST route for /logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route for home, only available for logged in users
-Route::get('/home', function () {
-    $userId = Auth::id(); // Same result
-    $allMatches = Matches::all();
+// Register routes (public)
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
 
-    // or: $userId = auth()->user()->id;
+// Home route (authenticated)
+Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name('home');
 
-    return view('home', compact('userId', 'allMatches'));
-})->middleware('auth');
+// Match routes
+Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+Route::get('/matches', [MatchController::class, 'store']); // Optional: waarom GET voor store?
+Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
+Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
+Route::post('/match/{matchId}/update', [MatchController::class, 'updateMatch']);
 
+// Category routes
+Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
 
+// Test email route
 Route::get('/test-email', function () {
     $user = (object) [
         'name' => 'Test User',
@@ -41,22 +45,15 @@ Route::get('/test-email', function () {
     ];
 
     Mail::to('158205@student.talland.nl')->send(new RegisterMail($user));
-
     return 'Test email sent!';
 });
 
-// Match routes
-Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
-Route::get('/add-match', [MatchController::class, 'show'])->name('add-match');
-
-// Category routes
-Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
-Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
-
-// admin page
+// Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
-Route::get('/admin', function () {return view('admin.admin');});
-    // routes for register
-Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/admin/register', [RegisterController::class, 'register']);
+    Route::get('/admin', function () {
+        return view('admin.admin');
+    });
+
+    Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
+    Route::post('/admin/register', [RegisterController::class, 'register']);
 });
