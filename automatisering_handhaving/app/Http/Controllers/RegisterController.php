@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\RegisterMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -48,6 +49,16 @@ class RegisterController extends Controller
 
         Mail::to($user->email)->send(new RegisterMail($user));
 
-        return redirect('/register');
+        return redirect()->route('register')->with('success', 'Gebruiker succesvol geregistreerd!');
     }
+// checks if the user is already registered
+    protected function validator(array $data)
+{
+    return Validator::make($data, [
+        'name' => ['required', 'string', 'max:255'],
+        'username' => ['required', 'string', 'max:255', 'unique:users'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ]);
+}
 }
