@@ -56,6 +56,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     //  route for admin classes page
 Route::get('/admin/classes', function () {return view('admin.classes');})->name('admin.classes');
 
+    //  route for user manage page
+Route::get('/admin/users', function () {return view('admin.users');})->name('admin.users');
+
     Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [RegisterController::class, 'register']);
 });
