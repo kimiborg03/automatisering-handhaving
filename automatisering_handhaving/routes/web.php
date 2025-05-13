@@ -29,7 +29,7 @@ Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name(
 // Match routes
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::get('/matches', [MatchController::class, 'store']); // Optional: waarom GET voor store?
-Route::get('/admin/add-match', [MatchController::class, 'show'])->name('add-match');
+Route::get('/admin/add-match', [MatchController::class, 'show'])->name('admin.add-match');
 Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
 Route::post('/match/{matchId}/update', [MatchController::class, 'updateMatch']);
 
@@ -50,10 +50,13 @@ Route::get('/test-email', function () {
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.admin');
-    });
+    //  route for admin dashboard
+    Route::get('/admin', function () {return view('admin.admin');});
+    
+    //  route for admin classes page
+Route::get('/admin/classes', function () {return view('admin.classes');})->name('admin.classes');
 
     Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [RegisterController::class, 'register']);
 });
+

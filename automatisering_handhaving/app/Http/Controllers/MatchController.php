@@ -78,6 +78,9 @@ class MatchController extends Controller
     public function show(){
         $groups = Groups::all();
 
-        return view('add-match', compact('groups'));
+        return view('admin.add-match', compact('groups'));
     }
+
+    
 }
+
