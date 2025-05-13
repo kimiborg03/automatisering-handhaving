@@ -27,7 +27,7 @@
                 {{-- empty space for layout --}}
                 <div class="admin-card admin-card-spacer"></div> 
             
-                <a href="{{ url('/add-match') }}" class="admin-card">
+                <a href="{{ url('/admin/add-match') }}" class="admin-card">
                     <h3>Wedstrijd toevoegen</h3>
                 </a>
             </div>
