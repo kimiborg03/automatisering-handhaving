@@ -15,6 +15,18 @@
                 <i class="bi bi-plus-circle"></i>
             </button>
         </div>
+        {{-- error message --}}
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+        {{-- success message --}}
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="class-list">
             {{-- list of classes --}}
             @foreach ($groups as $group)
