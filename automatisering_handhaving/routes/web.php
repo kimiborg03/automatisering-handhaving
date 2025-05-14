@@ -3,12 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GroupController;
 use App\Mail\RegisterMail;
 
 // Login routes
@@ -53,9 +55,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     //  route for admin dashboard
     Route::get('/admin', function () {return view('admin.admin');});
     
-    //  route for admin classes page
-Route::get('/admin/classes', function () {return view('admin.classes');})->name('admin.classes');
-
+//  route for admin classes page
+Route::get('/admin/classes', function () {$groups = DB::table('groups')->get();return view('admin.classes', compact('groups'));})->name('admin.classes');
+//  route for adding a class
+Route::post('/admin/classes/addclass', [GroupController::class, 'addclass'])->name('admin.classes.addclass');
+//  route for deleting a class
+Route::delete('/admin/classes/{id}', [GroupController::class, 'deleteclass'])->name('admin.classes.deleteclass');
+//  route for editing a class
+Route::put('/admin/classes/{id}', [GroupController::class, 'updateclass'])->name('admin.classes.updateclass');
     //  route for user manage page
 Route::get('/admin/users', function () {return view('admin.users');})->name('admin.users');
 
