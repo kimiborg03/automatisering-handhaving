@@ -1,40 +1,46 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/classes.css') }}">
 @endpush
 
 @section('title', 'Klassen beheren')
 
 @section('content')
-<h2>Klassen beheren</h2>
-{{-- add class button --}}
-<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addClassModal">
-    <i class="bi bi-plus-circle"></i>
-</button>
-<ul>
-    @foreach ($groups as $group)
-        <li>
-            {{ $group->name }}
-            {{-- delete button --}}
-            <form method="POST" action="{{ route('admin.classes.deleteclass', $group->id) }}" style="display: inline;" onsubmit="return confirmDelete('{{ $group->name }}')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger btn-sm">
-                    <i class="bi bi-trash"></i> Verwijderen
-                </button>
-            </form>
-            <!-- edit button -->
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editClassModal-{{ $group->id }}">
-                <i class="bi bi-pencil"></i> Bewerken
+    <div class="class-card">
+        <h2 class="text-center">Klassenbeheer</h2>
+        {{-- add class button --}}
+        <div class="text-end mb-3">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">
+                <i class="bi bi-plus-circle"></i>
             </button>
-        </li>
-    @endforeach
-</ul>
+        </div>
+        <div class="class-list">
+            {{-- list of classes --}}
+            @foreach ($groups as $group)
+                <div class="class-item mb-3">
+                    <span class="class-name">{{ $group->name }}</span>
+                    <div class="button-group">
+                        {{-- edit class button --}}
+                        <button type="button" class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#editClassModal-{{ $group->id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
 
-{{-- include modals --}}
+                        {{-- delete class button --}}
+                        <form method="POST" action="{{ route('admin.classes.deleteclass', $group->id) }}" class="d-inline" onsubmit="return confirmDelete('{{ $group->name }}')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+{{-- include modals for adding and editing popups --}}
 @include('admin.modals')
-
 @endsection
 
 @push('scripts')

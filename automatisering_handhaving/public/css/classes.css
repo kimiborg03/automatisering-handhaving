@@ -1,0 +1,41 @@
+/* Main content background and height */
+.content {
+    background-color: #56C65B;
+    min-height: calc(100vh - 100px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* White card container */
+.class-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.class-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Individual class row */
+.class-item {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.class-name {
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+h2 {
+    font-weight: 700;
+    padding-top: 10px;
+}

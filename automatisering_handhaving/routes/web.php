@@ -63,6 +63,7 @@ Route::post('/admin/classes/addclass', [GroupController::class, 'addclass'])->na
 Route::delete('/admin/classes/{id}', [GroupController::class, 'deleteclass'])->name('admin.classes.deleteclass');
 //  route for editing a class
 Route::put('/admin/classes/{id}', [GroupController::class, 'updateclass'])->name('admin.classes.updateclass');
+
     //  route for user manage page
 Route::get('/admin/users', function () {return view('admin.users');})->name('admin.users');
 
