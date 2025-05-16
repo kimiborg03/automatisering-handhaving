@@ -12,6 +12,35 @@ use Illuminate\Http\Request;
 
 class MatchController extends Controller
 {
+
+    public function updateMatch(Request $request, $matchId)
+    {
+        $match = Matches::findOrFail($matchId);
+        $users = json_decode($match->users, true) ?? [];
+        $newUserId = $request->input('user_id');
+
+        Log::info('Gebruiker toevoegen aan wedstrijd', [
+            'match_id' => $matchId,
+            'user_id' => $newUserId,
+            'bestaande_users' => $users
+        ]);
+
+        $alreadyExists = collect($users)->contains('user_id', $newUserId);
+
+        if (! $alreadyExists) {
+            $users[] = [
+                'user_id' => $newUserId,
+                'presence' => true,
+            ];
+
+            $match->users = json_encode($users);
+            $match->save();
+
+            return response()->json(['status' => 'user_added', 'user_id' => $newUserId]);
+        }
+
+        return response()->json(['status' => 'already_exists']);
+    }
     public function deleteUserFromMatch(Request $request, $matchId)
     {
         $match = Matches::findOrFail($matchId);
@@ -42,15 +71,17 @@ class MatchController extends Controller
             'check-in-time' => 'required',
             'kick-off-time' => 'required',
             'category' => 'required|string',
-            'groups' => 'required|array',
+            'groups' => 'nullable|array', // 👈 allow no groups
             'Limit' => 'nullable|integer',
             'comment' => 'nullable',
             'deadline' => 'nullable',
         ]);
 
-        $users = User::whereIn('group_id', $validated['groups'])->get();
+        $users = collect(); // 👈 empty fallback
+        if (!empty($validated['groups'])) {
+            $users = User::whereIn('group_id', $validated['groups'])->get();
+        }
 
-        // Zorg ervoor dat je hier $userData gebruikt in plaats van $users
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
@@ -67,7 +98,7 @@ class MatchController extends Controller
             'limit' => $request->input('Limit'),
             'deadline' => $request->input('deadline'),
             'comment' => $request->input('comment'),
-            'users' => json_encode($userData),  // Gebruik hier $userData
+            'users' => json_encode($userData),
         ]);
         
         return redirect()->back()->with('success', 'Wedstrijd opgeslagen!');
