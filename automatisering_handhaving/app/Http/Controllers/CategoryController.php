@@ -11,8 +11,12 @@ class CategoryController extends Controller
 {
     public function show($category)
     {
+        $userId = Auth::id();
+
+        $matches = MatchService::getMatchesForUser($userId);
+        $availableMatches = $matches['availableMatches'];
         $allMatches = Matches::where('category', $category)->get(); // Pas dit aan naar jouw logica
-        return view('category', compact('allMatches', 'category'));
+        return view('category', compact('allMatches', 'category', 'availableMatches'));
     }
 
     public function loadMatches(Request $request)

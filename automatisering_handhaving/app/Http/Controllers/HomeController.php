@@ -23,7 +23,8 @@ class HomeController extends Controller
         return view('home', [
             'userId' => $userId,
             'allMatches' => $matches['upcomingMatches'],
-            'playedMatches' => $matches['playedMatches']
+            'playedMatches' => $matches['playedMatches'],
+            'availableMatches' => $matches['availableMatches'],
         ]);
     }
 }

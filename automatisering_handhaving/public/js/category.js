@@ -154,6 +154,7 @@ function openMatchModal(match, showRuilButton) {
     body.innerHTML = stringThing;
 }
 
+const availableMatches = JSON.parse(document.getElementById('availableMatches').textContent);
 
 const userId = document.querySelector('meta[name="user-id"]').content;
 
@@ -180,7 +181,7 @@ function openSwapModal(currentMatch) {
     const body = document.getElementById('swap-modal-body');
     body.innerHTML = '';
 
-    allMatches.forEach(match => {
+    availableMatches.forEach(match => {
         if (match.id !== currentMatch.id) {
             const matchData = encodeURIComponent(JSON.stringify(match));
             body.innerHTML += `

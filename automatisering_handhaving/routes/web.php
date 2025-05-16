@@ -33,7 +33,7 @@ Route::post('/matches', [MatchController::class, 'store'])->name('matches.store'
 Route::get('/matches', [MatchController::class, 'store']); // Optional: waarom GET voor store?
 Route::get('/admin/add-match', [MatchController::class, 'show'])->name('admin.add-match');
 Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
-Route::post('/match/{matchId}/update', [MatchController::class, 'updateMatch']);
+Route::post('/match/{matchId}/update', action: [MatchController::class, 'updateMatch']);
 
 // Category routes
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');

@@ -13,6 +13,9 @@
 <script id="all-matches" type="application/json">
     {!! json_encode($allMatches) !!}
 </script>
+<script id="availableMatches" type="application/json">
+    {!! json_encode($availableMatches) !!}
+</script>
 
 @section('title', 'Wedstrijden - ' . $category)
 

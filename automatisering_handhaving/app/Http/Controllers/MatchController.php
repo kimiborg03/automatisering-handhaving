@@ -50,7 +50,7 @@ class MatchController extends Controller
 
         // Filter out the user
         $filteredUsers = array_filter($users, function ($user) use ($userIdToRemove) {
-            return $user['id'] !== $userIdToRemove;
+            return $user['user_id'] !== $userIdToRemove;
         });
 
         // Reindex and update
@@ -58,7 +58,7 @@ class MatchController extends Controller
         $match->save();
 
         // Geef een JSON-response terug in plaats van redirect
-        return response()->json(['status' => 'user_removed', 'match_id' => $matchId]);
+        return response()->json(data: ['status' => 'user_removed', 'match_id' => $matchId]);
     }
     public function store(Request $request)
     {
