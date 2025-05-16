@@ -9,6 +9,7 @@ class Matches extends Model
     protected $casts = [
         'checkin_time' => 'datetime',
         'kickoff_time' => 'datetime',
+        'deadline' => 'datetime',
         // add others like 'deadline' if needed
     ];
     protected $fillable = [
