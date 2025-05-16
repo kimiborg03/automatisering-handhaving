@@ -131,3 +131,13 @@
 .dropdown.active .dropdown-menu {
     display: block;
 }
+/* styling for logo */
+.talland-logo {
+    height: 40px;
+}
+
+@media (min-width: 992px) {
+    .talland-logo {
+        height: 60px;
+    }
+}

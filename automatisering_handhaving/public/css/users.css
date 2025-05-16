@@ -1,0 +1,15 @@
+.content {
+    background-color: #56C65B;
+    min-height: calc(100vh - 100px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+td {
+    background-color: #fff !important;
+}
+
+.back-button {
+    margin-bottom: 7px;
+    margin-left: 1px;
+}

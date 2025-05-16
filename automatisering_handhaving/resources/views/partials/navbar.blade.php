@@ -10,20 +10,26 @@
                 <i class="bi bi-person-circle" style="color: black; font-size: 40px;"></i>
             </a>
             <ul class="profile-menu">
-                <li><a href="{{ url('/account') }}">Account</a></li>
-                <li><a href="{{ url('/admin') }}">Admin</a></li>
-                <li>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="logout-button">Log uit</button>
-                    </form>
-                </li>
+        @if(Auth::check())
+            <li><a href="{{ url('/account') }}">Account</a></li>
+            <li><a href="{{ url('/admin') }}">Admin</a></li>
+            <li>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-button">Log uit</button>
+                </form>
+            </li>
+        @else
+            <li>
+                <a href="{{ route('login') }}" class="login-button">Inloggen</a>
+            </li>
+        @endif
             </ul>
         </li>
         {{-- talland logo --}}
         <li>
             <a href="{{ url('/home') }}">
-                <img src="{{ asset('images/tallandlogovoetbal.png') }}" alt="Talland Logo" style="height: 40px;">
+                <img src="{{ asset('images/tallandlogovoetbal.png') }}" alt="Talland Logo" class="talland-logo">
             </a>
         </li>
         {{-- category dropdown menu --}}
