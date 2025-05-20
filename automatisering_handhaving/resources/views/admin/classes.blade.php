@@ -52,7 +52,7 @@
         </div>
     </div>
 {{-- include modals for adding and editing popups --}}
-@include('admin.modals')
+@include('admin.classes-modals')
 @endsection
 
 @push('scripts')

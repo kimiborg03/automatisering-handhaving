@@ -11,6 +11,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\UsersController;
 use App\Mail\RegisterMail;
 
 // Login routes
@@ -55,18 +56,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
     //  route for admin dashboard
     Route::get('/admin', function () {return view('admin.admin');});
     
-//  route for admin classes page
-Route::get('/admin/classes', function () {$groups = DB::table('groups')->get();return view('admin.classes', compact('groups'));})->name('admin.classes');
-//  route for adding a class
-Route::post('/admin/classes/addclass', [GroupController::class, 'addclass'])->name('admin.classes.addclass');
-//  route for deleting a class
-Route::delete('/admin/classes/{id}', [GroupController::class, 'deleteclass'])->name('admin.classes.deleteclass');
-//  route for editing a class
-Route::put('/admin/classes/{id}', [GroupController::class, 'updateclass'])->name('admin.classes.updateclass');
+    //  route for admin classes page
+    Route::get('/admin/classes', function () {$groups = DB::table('groups')->get();return view('admin.classes', compact('groups'));})->name('admin.classes');
+    //  route for adding a class
+    Route::post('/admin/classes/addclass', [GroupController::class, 'addclass'])->name('admin.classes.addclass');
+    //  route for deleting a class
+    Route::delete('/admin/classes/{id}', [GroupController::class, 'deleteclass'])->name('admin.classes.deleteclass');
+    //  route for editing a class
+    Route::put('/admin/classes/{id}', [GroupController::class, 'updateclass'])->name('admin.classes.updateclass');
 
     //  route for user manage page
-Route::get('/admin/users', function () {return view('admin.users');})->name('admin.users');
+    Route::get('/admin/users', function () {return view('admin.users');})->name('admin.users');
+    Route::get('/admin/users', [UsersController::class, 'index'])->name('admin.users');
+    Route::put('/admin/users/{id}', [UsersController::class, 'update'])->name('admin.users.update');
 
+    // route for the register page
     Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [RegisterController::class, 'register']);
 });
