@@ -8,12 +8,23 @@ use App\Models\Groups;
 
 class UsersController extends Controller
 {
-    public function index()
-    {
-        $users = User::all();
-         $groups = Groups::all();
-         return view('admin.users', compact('users', 'groups'));
+    public function index(Request $request)
+{
+    $query = User::query();
+
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('username', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
     }
+
+    $users = $query->get();
+    $groups = Groups::all();
+    return view('admin.users', compact('users', 'groups'));
+}
     
     public function update(Request $request, $id)
 {
@@ -39,4 +50,5 @@ class UsersController extends Controller
 
     return redirect()->route('admin.users')->with('success', 'Gebruiker succesvol bijgewerkt!');
 }
+
 }

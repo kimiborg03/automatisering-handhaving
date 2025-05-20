@@ -13,3 +13,8 @@ td {
     margin-bottom: 7px;
     margin-left: 1px;
 }
+
+#userSearch {
+    max-width: 400px;
+    margin-right: 10px;
+}
