@@ -16,7 +16,15 @@
         {{-- search bar for users --}}
         <input type="text" id="userSearch" class="form-control" placeholder="Zoek gebruiker...">
     </div>
-
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle">
             <thead class="table-dark">
