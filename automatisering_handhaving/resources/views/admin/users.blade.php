@@ -16,6 +16,7 @@
         {{-- search bar for users --}}
         <input type="text" id="userSearch" class="form-control" placeholder="Zoek gebruiker...">
     </div>
+        {{-- error messages --}}
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
