@@ -19,5 +19,5 @@
     <td>{{ $user->access }}</td>
 </tr>
 
-@include('admin.modals')
+@include('admin.users-modals')
 @endforeach
