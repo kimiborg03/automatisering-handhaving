@@ -78,11 +78,6 @@
                             <input type="number" class="form-control" id="Limit" name="Limit">
                         </div>
 
-                        <div id="extraInputContainer" class="mb-3">
-                            <label for="deadline" class="form-label">Deadline</label>
-                            <input type="datetime-local" class="form-control" id="deadline" name="deadline">
-                        </div>
-
                         <div class="mb-3">
                             <label for="comment" class="form-label">Opmerking</label>
                             <textarea type="text" class="form-control" name="comment" id="comment"></textarea>

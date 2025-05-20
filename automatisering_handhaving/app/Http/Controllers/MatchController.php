@@ -7,7 +7,7 @@ use App\Models\Groups;
 use App\Models\Matches;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MatchController extends Controller
@@ -41,29 +41,42 @@ class MatchController extends Controller
 
         return response()->json(['status' => 'already_exists']);
     }
+
     public function deleteUserFromMatch(Request $request, $matchId)
     {
         $match = Matches::findOrFail($matchId);
-        $users = json_decode($match->users, true); // Decode JSON to array
+        $users = json_decode($match->users, true);
 
-        $userIdToRemove = $request->input('user_id'); // ✅ get user ID from the request
+        $userIdToRemove = (int) $request->input('user_id');
 
-        // Filter out the user
+        logger()->info('--- Delete User From Match Debug ---');
+        logger()->info('Match ID:', ['match_id' => $matchId]);
+        logger()->info('Requested user_id to remove:', ['user_id' => $userIdToRemove]);
+        logger()->info('Original users:', $users);
+
         $filteredUsers = array_filter($users, function ($user) use ($userIdToRemove) {
-            return $user['user_id'] !== $userIdToRemove;
+            return $user['user_id'] != $userIdToRemove;
         });
 
-        // Reindex and update
-        $match->users = json_encode(array_values($filteredUsers)); // reset array keys
-        $match->save();
+        logger()->info('Filtered users:', $filteredUsers);
 
-        // Geef een JSON-response terug in plaats van redirect
+        $match->users = json_encode(array_values($filteredUsers));
+        $saveSuccess = $match->save();
+
+        if ($saveSuccess) {
+            logger()->info('Match succesvol opgeslagen met nieuwe users.');
+        } else {
+            logger()->warning('Opslaan van match is mislukt!');
+        }
+
         return response()->json(data: ['status' => 'user_removed', 'match_id' => $matchId]);
     }
+
     public function store(Request $request)
     {
         $checkinTime = $request->date . ' ' . $request->input('check-in-time') . ':00';
         $kickoffTime = $request->date . ' ' . $request->input('kick-off-time') . ':00';
+
         $validated = $request->validate([
             'name-match' => 'required|string',
             'location' => 'required|string',
@@ -71,13 +84,14 @@ class MatchController extends Controller
             'check-in-time' => 'required',
             'kick-off-time' => 'required',
             'category' => 'required|string',
-            'groups' => 'nullable|array', // 👈 allow no groups
+            'groups' => 'nullable|array',
             'Limit' => 'nullable|integer',
             'comment' => 'nullable',
-            'deadline' => 'nullable',
+            // deadline mag meegegeven worden, maar is optioneel
+            'deadline' => 'nullable|date',
         ]);
 
-        $users = collect(); // 👈 empty fallback
+        $users = collect();
         if (!empty($validated['groups'])) {
             $users = User::whereIn('group_id', $validated['groups'])->get();
         }
@@ -89,6 +103,9 @@ class MatchController extends Controller
             ];
         });
 
+        // Bereken deadline als die niet is meegegeven
+        $deadline = $validated['deadline'] ?? Carbon::parse($checkinTime)->subDays(3)->format('Y-m-d H:i:s');
+
         Matches::create([
             'name' => $request->input('name-match'),
             'location' => $request->input('location'),
@@ -96,11 +113,11 @@ class MatchController extends Controller
             'kickoff_time' => $kickoffTime,
             'category' => $request->input('category'),
             'limit' => $request->input('Limit'),
-            'deadline' => $request->input('deadline'),
+            'deadline' => $deadline,
             'comment' => $request->input('comment'),
             'users' => json_encode($userData),
         ]);
-        
+
         return redirect()->back()->with('success', 'Wedstrijd opgeslagen!');
     }
 
