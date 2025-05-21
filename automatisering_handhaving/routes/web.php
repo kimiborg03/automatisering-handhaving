@@ -75,3 +75,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/register', [RegisterController::class, 'register']);
 });
 
+    // Route for the account page
+Route::get('/account', function () {return view('account');})->name('account');
