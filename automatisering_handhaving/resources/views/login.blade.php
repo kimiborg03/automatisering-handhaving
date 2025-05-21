@@ -26,5 +26,18 @@
                 <button type="submit" class="loginbutton">Inloggen</button>
             </form>
         @endauth
+        {{-- show errors --}}
+            @if (session('error'))
+                <div class="error">{{ session('error') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="error">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
     </div>
 @endsection
