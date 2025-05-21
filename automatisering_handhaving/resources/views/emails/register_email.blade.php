@@ -5,8 +5,9 @@
     <title>Welkom</title>
 </head>
 <body>
-    <h1>Welkom, {{ $user->name }}!</h1>
-    <p>Bedankt voor je registratie bij onze applicatie. We zijn blij je aan boord te hebben!</p>
-    <p>Als je vragen hebt, neem dan gerust contact met ons op.</p>
+<h1>Welkom, {{ $user->name }}!</h1>
+<p>Klik op onderstaande knop om je wachtwoord in te stellen:</p>
+<p><a href="{{ $link }}">Wachtwoord instellen</a></p>
+
 </body>
 </html>

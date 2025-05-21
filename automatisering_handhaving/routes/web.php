@@ -13,7 +13,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\UsersController;
 use App\Mail\RegisterMail;
-
+use App\Http\Controllers\PasswordSetupController;
 // Login routes
 Route::get('/login', function () {
     return view('login');
@@ -40,16 +40,6 @@ Route::post('/match/{matchId}/update', action: [MatchController::class, 'updateM
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
 Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
 
-// Test email route
-Route::get('/test-email', function () {
-    $user = (object) [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-    ];
-
-    Mail::to('158205@student.talland.nl')->send(new RegisterMail($user));
-    return 'Test email sent!';
-});
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -75,5 +65,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/register', [RegisterController::class, 'register']);
 });
 
-    // Route for the account page
+// Route for the account page
 Route::get('/account', function () {return view('account');})->name('account');
+
+// password setup route
+Route::get('/password/setup/{token}', [RegisterController::class, 'showPasswordSetupForm'])->name('password.setup.form')->middleware('signed');
+// save password route
+Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');

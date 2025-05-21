@@ -3,44 +3,32 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class RegisterMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $user;
+    public $link;
 
-    public function __construct($user)
+    /**
+     * Create a new message instance.
+     */
+    public function __construct($user, $link)
     {
-        $this->user = $user; 
-    }
-
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Welkom bij onze applicatie!',
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.register_email',
-        );
+        $this->user = $user;
+        $this->link = $link;
     }
 
     /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * Build the message.
      */
-    public function attachments(): array
+    public function build()
     {
-        return [];
+        return $this->subject('Stel je wachtwoord in - Automatisering Handhaving')
+                    ->view('emails.register_email');
     }
 }
