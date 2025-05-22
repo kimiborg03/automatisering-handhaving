@@ -87,7 +87,6 @@ class MatchController extends Controller
             'groups' => 'nullable|array',
             'Limit' => 'nullable|integer',
             'comment' => 'nullable',
-            // deadline mag meegegeven worden, maar is optioneel
             'deadline' => 'nullable|date',
         ]);
 
@@ -118,7 +117,9 @@ class MatchController extends Controller
             'users' => json_encode($userData),
         ]);
 
-        return redirect()->back()->with('success', 'Wedstrijd opgeslagen!');
+        return redirect()->route('admin.add-match')->with('success', "Wedstrijd '{$request->input('name-match')}' is succesvol toegevoegd!");
+
+    
     }
 
 
