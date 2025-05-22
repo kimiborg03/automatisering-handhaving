@@ -115,6 +115,7 @@ class MatchController extends Controller
             'deadline' => $deadline,
             'comment' => $request->input('comment'),
             'users' => json_encode($userData),
+            'groups' => $validated['groups'] ?? [],
         ]);
 
         return redirect()->route('admin.add-match')->with('success', "Wedstrijd '{$request->input('name-match')}' is succesvol toegevoegd!");
