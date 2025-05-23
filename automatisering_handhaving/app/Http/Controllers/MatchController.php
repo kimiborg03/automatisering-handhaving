@@ -32,6 +32,15 @@ $user = $guard->user();
 
     return response()->json(['status' => 'success']);
 }
+    public function removeDeadline(Request $request, $id)
+    {
+
+        $match = Matches::findOrFail($id);
+        $match->deadline = null;
+        $match->save();
+
+        return response()->json(['status' => 'success']);
+    }
 
 
     public function updateMatch(Request $request, $matchId)

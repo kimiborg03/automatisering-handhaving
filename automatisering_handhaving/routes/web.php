@@ -43,6 +43,8 @@ Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('m
 
 Route::post('/admin/match/{id}/set-deadline-now', [MatchController::class, 'setDeadlineToNow'])->middleware('auth');
 
+Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
+
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
 
