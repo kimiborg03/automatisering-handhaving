@@ -129,7 +129,7 @@ $user = $guard->user();
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
-                'presence' => true,
+                'presence' => false,
             ];
         });
 
