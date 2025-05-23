@@ -51,7 +51,7 @@ $user = $guard->user();
         if (! $alreadyExists) {
             $users[] = [
                 'user_id' => $newUserId,
-                'presence' => true,
+                'presence' => false,
             ];
 
             $match->users = json_encode($users);

@@ -14,7 +14,7 @@ class UsersController extends Controller
     {
         $query = User::query();
 
-        // Filter on search
+        // Filter on search term
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -27,7 +27,7 @@ class UsersController extends Controller
         $users = $query->orderBy('id')->paginate(30);
         $groups = Groups::all();
 
-        // Load more users via AJAX
+        // Voor AJAX
         if ($request->ajax()) {
             return view('partials.user-rows', compact('users', 'groups'))->render();
         }
@@ -37,14 +37,13 @@ class UsersController extends Controller
 
     public function update(Request $request, $id)
     {
-        // validate
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')->ignore($id),
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('users')->ignore($id),
             ],
             'email' => [
                 'required',
@@ -58,7 +57,6 @@ class UsersController extends Controller
         ]);
 
         $user = User::findOrFail($id);
-
         $originalGroupId = $user->group_id;
         $newGroupId = $request->group_id;
 
@@ -72,25 +70,30 @@ class UsersController extends Controller
             'access' => $request->has('access') ? 1 : 0,
         ]);
 
-        // if the group has changed, update matches
         if ($originalGroupId != $newGroupId) {
-            // Remove user from all matches where presence is false
-            $matches = Matches::whereJsonContains('users', [['user_id' => $user->id]])->get();
+            // delete user if presence is false
+            $allMatches = Matches::all();
 
-            foreach ($matches as $match) {
+            foreach ($allMatches as $match) {
                 $users = json_decode($match->users, true) ?? [];
+                $updated = false;
+                $filteredUsers = [];
 
-                // Filter out this user if presence is false
-                $filteredUsers = collect($users)
-                    ->reject(fn($u) => $u['user_id'] == $user->id && $u['presence'] === false)
-                    ->values()
-                    ->all();
+                foreach ($users as $u) {
+                    if ($u['user_id'] == $user->id && $u['presence'] === false) {
+                        $updated = true;
+                        continue;
+                    }
+                    $filteredUsers[] = $u;
+                }
 
-                $match->users = $filteredUsers;
-                $match->save();
+                if ($updated) {
+                    $match->users = $filteredUsers;
+                    $match->save();
+                }
             }
 
-            // Add user to new group's matches with presence = false
+            // add user to all matches for the new group
             if ($newGroupId) {
                 $matchesWithGroup = Matches::whereJsonContains('groups', $newGroupId)->get();
 
