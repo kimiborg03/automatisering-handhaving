@@ -108,11 +108,17 @@
                                 <div class="form-check">
                                     <input class="form-check-input @error('groups') is-invalid @enderror" type="checkbox" name="groups[]" value="{{ $group->id }}" id="group{{ $group->id }}"
                                         {{ is_array(old('groups')) && in_array($group->id, old('groups')) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="group{{ $group->id }}">
-                                        {{ $group->name }}
-                                    </label>
+                                        {{-- badge with users count --}}
+                                <label class="form-check-label d-flex justify-content-between w-100" for="group{{ $group->id }}">
+                                    <span>{{ $group->name }}</span>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-people-fill me-1"></i>{{ $group->users_count }}
+                                    </span>
+                                </label>
+
                                 </div>
                             @endforeach
+
                             @error('groups')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror

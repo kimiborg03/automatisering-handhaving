@@ -136,7 +136,7 @@ class MatchController extends Controller
 
 
     public function show(){
-        $groups = Groups::all();
+        $groups = Groups::withCount('users')->get();
 
         return view('admin.add-match', compact('groups'));
     }
