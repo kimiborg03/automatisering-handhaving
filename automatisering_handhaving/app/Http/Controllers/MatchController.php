@@ -95,6 +95,16 @@ class MatchController extends Controller
             $users = User::whereIn('group_id', $validated['groups'])->get();
         }
 
+        $totalUsers = $users->count();
+        $limit = (int) ($validated['Limit'] ?? 0);
+
+        if ($limit > 0 && $totalUsers > $limit) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['Limit' => "Het totaal aantal geselecteerde gebruikers ($totalUsers) is groter dan het limiet ($limit)."]);
+        }
+
+
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
