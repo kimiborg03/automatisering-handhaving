@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Groups;
+use App\Models\Matches;
 
 class UsersController extends Controller
 {
@@ -54,14 +55,37 @@ public function update(Request $request, $id)
     ]);
 
     $user = User::findOrFail($id);
+
+    $originalGroupId = $user->group_id;
+    $newGroupId = $request->group_id;
+
+    // Update user
     $user->update([
         'name' => $request->name,
         'username' => $request->username,
         'email' => $request->email,
-        'group_id' => $request->group_id,
+        'group_id' => $newGroupId,
         'role' => $request->role,
         'access' => $request->has('access') ? 1 : 0,
     ]);
+
+    // Only run cleanup if group_id changed
+    if ($originalGroupId != $newGroupId) {
+        $matches = Matches::whereJsonContains('users', [['user_id' => $user->id]])->get();
+
+        foreach ($matches as $match) {
+            $users = json_decode($match->users, true);
+
+            // Filter out this user if presence is false
+            $filteredUsers = collect($users)
+                ->reject(fn($u) => $u['user_id'] == $user->id && $u['presence'] === false)
+                ->values()
+                ->all();
+
+            $match->users = $filteredUsers;
+            $match->save();
+        }
+    }
 
     return redirect()->route('admin.users')->with('success', 'Gebruiker succesvol bijgewerkt!');
 }
