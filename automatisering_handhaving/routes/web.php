@@ -12,6 +12,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AccountController;
 use App\Mail\RegisterMail;
 use App\Http\Controllers\PasswordSetupController;
 // Login routes
@@ -74,3 +75,4 @@ Route::get('/account', function () {return view('account');})->name('account');
 Route::get('/password/setup/{token}', [RegisterController::class, 'showPasswordSetupForm'])->name('password.setup.form')->middleware('signed');
 // save password route
 Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');
+

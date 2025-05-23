@@ -10,6 +10,7 @@ class Matches extends Model
         'checkin_time' => 'datetime',
         'kickoff_time' => 'datetime',
         'deadline' => 'datetime',
+        'groups' => 'array',
         // add others like 'deadline' if needed
     ];
     protected $fillable = [
@@ -21,6 +22,7 @@ class Matches extends Model
         'category',
         'limit',
         'deadline',
-        'users'
+        'users',
+        'groups'
     ];
 }

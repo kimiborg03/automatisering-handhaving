@@ -108,7 +108,6 @@ $user = $guard->user();
             'groups' => 'nullable|array',
             'Limit' => 'nullable|integer',
             'comment' => 'nullable',
-            // deadline mag meegegeven worden, maar is optioneel
             'deadline' => 'nullable|date',
         ]);
 
@@ -116,6 +115,16 @@ $user = $guard->user();
         if (!empty($validated['groups'])) {
             $users = User::whereIn('group_id', $validated['groups'])->get();
         }
+
+        $totalUsers = $users->count();
+        $limit = (int) ($validated['Limit'] ?? 0);
+
+        if ($limit > 0 && $totalUsers > $limit) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['Limit' => "Het totaal aantal geselecteerde gebruikers ($totalUsers) is groter dan het limiet ($limit)."]);
+        }
+
 
         $userData = $users->map(function ($user) {
             return [
@@ -137,15 +146,18 @@ $user = $guard->user();
             'deadline' => $deadline,
             'comment' => $request->input('comment'),
             'users' => json_encode($userData),
+            'groups' => $validated['groups'] ?? [],
         ]);
 
-        return redirect()->back()->with('success', 'Wedstrijd opgeslagen!');
+        return redirect()->route('admin.add-match')->with('success', "Wedstrijd '{$request->input('name-match')}' is succesvol toegevoegd!");
+
+    
     }
 
 
 
     public function show(){
-        $groups = Groups::all();
+        $groups = Groups::withCount('users')->get();
 
         return view('admin.add-match', compact('groups'));
     }
