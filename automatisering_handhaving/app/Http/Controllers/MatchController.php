@@ -9,9 +9,30 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+    /** @var \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard $guard */
 
 class MatchController extends Controller
 {
+public function setDeadlineToNow(Request $request, $id)
+{
+$guard = Auth::guard();
+
+$user = $guard->user();
+
+    // $user = auth()->user();
+
+    // if (!$user->is_admin) {
+    //     abort(403, 'Unauthorized');
+    // }
+
+    $match = Matches::findOrFail($id);
+    $match->deadline = now();
+    $match->save();
+
+    return response()->json(['status' => 'success']);
+}
+
 
     public function updateMatch(Request $request, $matchId)
     {
