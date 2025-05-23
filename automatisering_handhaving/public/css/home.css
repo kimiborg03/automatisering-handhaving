@@ -3,3 +3,38 @@
     padding-top: 20px;
     padding-bottom: 100px;
 }
+.scoreboard {
+
+    font-family: 'Orbitron', sans-serif;
+    background-color: white;
+    color: #0f0;
+    padding: 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.scoreboard-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #0f0;
+}
+
+
+.scoreboard-numbers {
+    display: flex;
+    /* justify-content: space-around; */
+    font-size: 3rem;
+}
+
+.scoreboard-label {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    color: #7f7;
+}
+
+
+.scoreboard-section {
+    flex: 1;
+
+}

@@ -10,8 +10,48 @@ document.addEventListener('DOMContentLoaded', function () {
     const noMoreText = document.getElementById('no-more');
     console.log("Category:", category);
     console.log("CSRF Token:", csrfToken); // ✅ nu veilig
-    console.log("User ID:", userId);
+    // console.log("User ID:", userId);
+    document.getElementById('confirm-remove-deadline-btn').addEventListener('click', function () {
+        if (!pendingDeadlineMatchId) return;
+
+        fetch(`/admin/match/${pendingDeadlineMatchId}/remove-deadline`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+        })
+            .then(res => res.json())
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('removeDeadlineModal')).hide();
+                location.reload();
+            })
+            .catch(err => {
+                console.error("Fout bij deadline verwijderen:", err);
+                alert("Fout bij deadline verwijderen.");
+            });
+    });
     console.log("All Matches:", allMatches);
+    document.getElementById('confirm-deadline-btn').addEventListener('click', function () {
+        if (!pendingDeadlineMatchId) return;
+
+        fetch(`/admin/match/${pendingDeadlineMatchId}/set-deadline-now`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+        })
+            .then(res => res.json())
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('confirmDeadlineModal')).hide();
+                location.reload();
+            })
+            .catch(err => {
+                console.error("Fout bij deadline zetten:", err);
+                alert("Fout bij deadline zetten.");
+            });
+    });
 
     function loadMatches() {
         console.log('Loading matches... Offset:', offset, 'Category:', category);
@@ -50,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="card-body">
                                 <h5 class="card-title">${match.name}</h5>
                                 <p class="card-text mb-1"><strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}</p>
+                                <p class="card-text mb-1"><strong>Deadline:</strong> ${new Date(match.deadline).toLocaleDateString()}</p>
                                 <p class="card-text mb-1"><strong>Locatie:</strong> ${match.location}</p>
                                 <p class="card-text mb-1"><strong>Check-in:</strong> ${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                 <p class="card-text mb-2"><strong>Aftrap:</strong> ${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -112,6 +153,7 @@ function openMatchModal(match, showRuilButton) {
     const body = document.getElementById('modal-content-body');
     let stringThing = `
             <p><strong>Naam:</strong> ${match.name}</p>
+            <p><strong>Deadline:</strong> ${match.deadline}</p>
             <p><strong>Datum:</strong> ${formatUtc(match.checkin_time)}</p>
             <p><strong>Locatie:</strong> ${match.location}</p>
             <p><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
@@ -131,34 +173,178 @@ function openMatchModal(match, showRuilButton) {
     //             </button>
     //         `;
     // }
-    if (!matchUsers.some(u => u.user_id == userId)) {
-        console.log("User is not in match, show signup button");
-        stringThing += `
+    const deadlineIsNull = match.deadline === null || match.deadline === "null";
+
+    if (deadlineIsNull) {
+
+        if (!matchUsers.some(u => u.user_id == userId)) {
+            console.log("User is not in match, show signup button");
+            stringThing += `
         <button class="btn btn-outline-success btn-sm w-100 mt-2"
             onclick="confirmSignup(${match.id})">
             Aanmelden
         </button>
     `;
-    } else {
-        const matchData = encodeURIComponent(JSON.stringify(match));
-        stringThing += `
-        <button class="btn btn-outline-warning btn-sm w-100 mt-2"
-            data-bs-toggle="modal"
-            data-bs-target="#swapModal"
-            onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
-            Wedstrijd Ruilen
-        </button>
-        <button class="btn btn-outline-danger btn-sm w-100 mt-2"
-            onclick="confirmUnsubscribe(${match.id})">
-            Afmelden
-        </button>
-    `;
+        } else {
+            // console.log("Is admin?", isAdmin);
+            console.log("Deadline is null?", deadlineIsNull);
+
+            const matchData = encodeURIComponent(JSON.stringify(match));
+            stringThing += `
+            <button class="btn btn-outline-warning btn-sm w-100 mt-2"
+                data-bs-toggle="modal"
+                data-bs-target="#swapModal"
+                onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
+                Wedstrijd Ruilen
+            </button>
+            <button class="btn btn-outline-danger btn-sm w-100 mt-2"
+                onclick="confirmUnsubscribe(${match.id})">
+                Afmelden
+            </button>
+        `;
+        }
     }
+    const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
 
+    if (isAdmin) {
+        if (deadlineIsNull) {
+            stringThing += `
+    <button class="btn btn-outline-dark btn-sm w-100 mt-2 set-deadline-btn"
+        data-match-id="${match.id}">
+        Sluit deadline
+    </button>
+        `;
+        } else {
+            stringThing += `
+<button class="btn btn-outline-dark btn-sm w-100 mt-2 remove-deadline-btn"
+    data-match-id="${match.id}">
+    Verwijder deadline
+</button>
+        `;
+        }
 
+    }
     body.innerHTML = stringThing;
+
 }
 
+// document.getElementById('confirm-deadline-btn').addEventListener('click', function () {
+//     if (!pendingDeadlineMatchId) return;
+
+//     fetch(`/admin/match/${pendingDeadlineMatchId}/set-deadline-now`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken
+//         },
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         bootstrap.Modal.getInstance(document.getElementById('confirmDeadlineModal')).hide();
+//         location.reload();
+//     })
+//     .catch(err => {
+//         console.error("Fout bij deadline zetten:", err);
+//         alert("Fout bij deadline zetten.");
+//     });
+// });
+
+// document.getElementById('confirm-remove-deadline-btn').addEventListener('click', function () {
+//     if (!pendingDeadlineMatchId) return;
+
+//     fetch(`/admin/match/${pendingDeadlineMatchId}/remove-deadline`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken
+//         },
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         bootstrap.Modal.getInstance(document.getElementById('removeDeadlineModal')).hide();
+//         location.reload();
+//     })
+//     .catch(err => {
+//         console.error("Fout bij deadline verwijderen:", err);
+//         alert("Fout bij deadline verwijderen.");
+//     });
+// });
+
+
+// function setDeadlineNow(matchId) {
+//     if (!confirm("Weet je zeker dat je de deadline nu wilt zetten?")) return;
+//     console.log("Verstuur verzoek naar:", `/admin/match/${matchId}/set-deadline-now`);
+//     console.log("CSRF Token:", csrfToken);
+
+//     fetch(`/admin/match/${matchId}/set-deadline-now`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken
+//         },
+//     })
+//         .then(async res => {
+//             console.log("HTTP status:", res.status);
+//             const text = await res.text();
+//             console.log("Antwoord tekst:", text);
+//             return JSON.parse(text);
+//         })
+//         .catch(err => {
+//             console.error("Fout bij fetch:", err);
+//         });
+// }
+// function removeDeadline(matchId) {
+//     if (!confirm("Weet je zeker dat je de deadline nu wilt zetten?")) return;
+//     console.log("Verstuur verzoek naar:", `/admin/match/${matchId}/remove-deadline`);
+//     console.log("CSRF Token:", csrfToken);
+
+//     fetch(`/admin/match/${matchId}/remove-deadline`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken
+//         },
+//     })
+//         .then(async res => {
+//             console.log("HTTP status:", res.status);
+//             const text = await res.text();
+//             console.log("Antwoord tekst:", text);
+//             return JSON.parse(text);
+//         })
+//         .catch(err => {
+//             console.error("Fout bij fetch:", err);
+//         });
+// }
+let pendingDeadlineMatchId = null;
+document.addEventListener('click', function (e) {
+    if (e.target.matches('.set-deadline-btn')) {
+        const matchId = e.target.getAttribute('data-match-id');
+        pendingDeadlineMatchId = matchId;
+        const modal = new bootstrap.Modal(document.getElementById('confirmDeadlineModal'));
+        modal.show();
+    }
+
+    if (e.target.matches('.remove-deadline-btn')) {
+        const matchId = e.target.getAttribute('data-match-id');
+        pendingDeadlineMatchId = matchId;
+        const modal = new bootstrap.Modal(document.getElementById('removeDeadlineModal'));
+        modal.show();
+    }
+});
+
+
+
+function setDeadlineNow(matchId) {
+    pendingDeadlineMatchId = matchId;
+    const modal = new bootstrap.Modal(document.getElementById('confirmDeadlineModal'));
+    modal.show();
+}
+
+function removeDeadline(matchId) {
+    pendingDeadlineMatchId = matchId;
+    const modal = new bootstrap.Modal(document.getElementById('removeDeadlineModal'));
+    modal.show();
+}
 const availableMatches = JSON.parse(document.getElementById('availableMatches').textContent);
 
 const userId = document.querySelector('meta[name="user-id"]').content;
@@ -180,7 +366,6 @@ function confirmSignup(matchId) {
 
 
 function openSwapModal(currentMatch) {
-    // Gebruik deze bestaande variabele uit het begin van je script
     selectedSwap.fromMatch = currentMatch;
 
     const body = document.getElementById('swap-modal-body');
@@ -218,7 +403,7 @@ function prepareConfirm(toMatch) {
 }
 
 function confirmAction() {
-    const userId = document.querySelector('meta[name="user-id"]').content; // Zorg ervoor dat dit de juiste waarde heeft in de meta tag
+    const userId = document.querySelector('meta[name="user-id"]').content;
     const fromMatchId = selectedSwap.fromMatch.id;
     const toMatchId = selectedSwap.toMatch.id;
     console.log("confirmAction gestart!");
@@ -304,12 +489,10 @@ document.addEventListener('DOMContentLoaded', function () {
     window.confirmSignup = function (matchId) {
         pendingSignupMatchId = matchId;
 
-        // Sluit de huidige match modal eerst
         const matchModalEl = document.getElementById('matchModal');
         const matchModalInstance = bootstrap.Modal.getInstance(matchModalEl);
         if (matchModalInstance) matchModalInstance.hide();
 
-        // Open de bevestigingsmodal
         const signupModal = new bootstrap.Modal(document.getElementById('signupConfirmModal'));
         signupModal.show();
     };
@@ -355,12 +538,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function confirmUnsubscribe(matchId) {
     pendingUnsubscribeMatchId = matchId;
 
-    // Sluit huidige modal
     const matchModalEl = document.getElementById('matchModal');
     const matchModalInstance = bootstrap.Modal.getInstance(matchModalEl);
     if (matchModalInstance) matchModalInstance.hide();
 
-    // Open bevestigingsmodal
     const unsubscribeModal = new bootstrap.Modal(document.getElementById('unsubscribeConfirmModal'));
     unsubscribeModal.show();
 }

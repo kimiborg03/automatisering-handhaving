@@ -62,3 +62,41 @@
         </div>
     </div>
 </div>
+        <!-- Deadline bevestigingsmodal -->
+        <div class="modal fade" id="confirmDeadlineModal" tabindex="-1" aria-labelledby="confirmDeadlineLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeadlineLabel">Deadline sluiten</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                    </div>
+                    <div class="modal-body" id="deadline-modal-body">
+                        Weet je zeker dat je de deadline nu wilt zetten?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleer</button>
+                        <button type="button" class="btn btn-dark" id="confirm-deadline-btn">Bevestig</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Deadline verwijderen bevestigingsmodal -->
+<div class="modal fade" id="removeDeadlineModal" tabindex="-1" aria-labelledby="removeDeadlineLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeDeadlineLabel">Deadline verwijderen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je de deadline wilt verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleer</button>
+                <button type="button" class="btn btn-dark" id="confirm-remove-deadline-btn">Bevestig</button>
+            </div>
+        </div>
+    </div>
+</div>
