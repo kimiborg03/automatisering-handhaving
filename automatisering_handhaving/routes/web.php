@@ -40,9 +40,11 @@ Route::post('/match/{matchId}/update', action: [MatchController::class, 'updateM
 Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
 Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
 
+Route::post('/admin/match/{id}/set-deadline-now', [MatchController::class, 'setDeadlineToNow'])->middleware('auth');
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
+
     //  route for admin dashboard
     Route::get('/admin', function () {return view('admin.admin');});
     
