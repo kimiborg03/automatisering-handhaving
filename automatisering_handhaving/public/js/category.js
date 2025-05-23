@@ -142,14 +142,19 @@ function openMatchModal(match, showRuilButton) {
     } else {
         const matchData = encodeURIComponent(JSON.stringify(match));
         stringThing += `
-                <button class="btn btn-outline-warning btn-sm w-100 mt-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#swapModal"
-                    onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
-                    Wedstrijd Ruilen
-                </button>
-            `;
+        <button class="btn btn-outline-warning btn-sm w-100 mt-2"
+            data-bs-toggle="modal"
+            data-bs-target="#swapModal"
+            onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
+            Wedstrijd Ruilen
+        </button>
+        <button class="btn btn-outline-danger btn-sm w-100 mt-2"
+            onclick="confirmUnsubscribe(${match.id})">
+            Afmelden
+        </button>
+    `;
     }
+
 
     body.innerHTML = stringThing;
 }
@@ -258,7 +263,42 @@ function confirmAction() {
         });
 }
 
+let pendingUnsubscribeMatchId = null;
+
 document.addEventListener('DOMContentLoaded', function () {
+
+
+
+
+    document.getElementById('confirm-unsubscribe-btn').addEventListener('click', function () {
+        if (!pendingUnsubscribeMatchId) return;
+
+        // /match/{matchId}/user/remove
+        const userId = document.querySelector('meta[name="user-id"]').content;
+
+        fetch(`/match/${pendingUnsubscribeMatchId}/user/remove`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+            .then(async res => {
+                const text = await res.text();
+                return JSON.parse(text);
+            })
+            .then(data => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('unsubscribeConfirmModal'));
+                if (modal) modal.hide();
+                location.reload();
+            })
+            .catch(err => {
+                console.error("Fout bij afmelden:", err);
+                alert("Er is iets misgegaan bij het afmelden.");
+            });
+    });
+
     let pendingSignupMatchId = null;
 
     window.confirmSignup = function (matchId) {
@@ -311,3 +351,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+
+function confirmUnsubscribe(matchId) {
+    pendingUnsubscribeMatchId = matchId;
+
+    // Sluit huidige modal
+    const matchModalEl = document.getElementById('matchModal');
+    const matchModalInstance = bootstrap.Modal.getInstance(matchModalEl);
+    if (matchModalInstance) matchModalInstance.hide();
+
+    // Open bevestigingsmodal
+    const unsubscribeModal = new bootstrap.Modal(document.getElementById('unsubscribeConfirmModal'));
+    unsubscribeModal.show();
+}
