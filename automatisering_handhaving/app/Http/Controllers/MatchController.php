@@ -163,13 +163,44 @@ $user = $guard->user();
     
     }
 
-
-
     public function show(){
         $groups = Groups::withCount('users')->get();
 
         return view('admin.add-match', compact('groups'));
     }
+
+// function for page with registrations for a match
+public function showRegistrations($matchId)
+{
+    $match = \App\Models\Matches::findOrFail($matchId);
+    $users = json_decode($match->users, true) ?? [];
+
+    $userIds = collect($users)->pluck('user_id')->all();
+    $userDetails = \App\Models\User::whereIn('id', $userIds)->get();
+
+    $groups = \App\Models\Groups::pluck('name', 'id');
+
+    return view('matchregistrations', compact('match', 'users', 'userDetails', 'groups'));
+}
+
+public function updatePresence(Request $request, $matchId)
+{
+    $match = \App\Models\Matches::findOrFail($matchId);
+    $users = json_decode($match->users, true) ?? [];
+
+    foreach ($users as &$user) {
+        if ($user['user_id'] == $request->user_id) {
+            $user['presence'] = (bool)$request->presence;
+            break;
+        }
+    }
+
+    $match->users = json_encode($users);
+    $match->save();
+
+    return response()->json(['success' => true]);
+}
+
 
     
 }
