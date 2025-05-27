@@ -60,7 +60,7 @@ $user = $guard->user();
         if (! $alreadyExists) {
             $users[] = [
                 'user_id' => $newUserId,
-                'presence' => true,
+                'presence' => false,
             ];
 
             $match->users = json_encode($users);
@@ -138,7 +138,7 @@ $user = $guard->user();
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
-                'presence' => true,
+                'presence' => false,
             ];
         });
 
