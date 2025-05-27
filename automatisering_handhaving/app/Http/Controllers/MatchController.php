@@ -151,7 +151,23 @@ $user = $guard->user();
         return redirect()->back()->with('success', 'Wedstrijd opgeslagen!');
     }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            // voeg hier eventueel extra validatie toe
+        ]);
 
+        $match = Matches::findOrFail($id);
+
+        $match->name = $request->input('name');
+        $match->location = $request->input('location');
+        // voeg hier andere velden toe
+        $match->save();
+
+        return redirect()->back()->with('success', 'Wedstrijd succesvol bijgewerkt.');
+    }
 
     public function show(){
         $groups = Groups::all();

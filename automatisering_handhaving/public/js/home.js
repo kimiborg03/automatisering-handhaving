@@ -129,6 +129,13 @@ function openMatchModal(match, showRuilButton) {
     const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
 
     if (isAdmin) {
+        content += `
+<button class="btn btn-outline-primary btn-sm w-100 mt-2"
+    onclick='openEditMatchModal(${JSON.stringify(match)})'>
+    Bewerken
+</button>
+`;
+
         if (deadlineIsNull) {
             content += `
     <button class="btn btn-outline-dark btn-sm w-100 mt-2 set-deadline-btn"
@@ -259,6 +266,28 @@ function confirmAction() {
         .catch(err => {
             console.error("Fout tijdens fetch:", err);
         });
+}
+function openEditMatchModal(match) {
+    const modal = new bootstrap.Modal(document.getElementById('editMatchModal'));
+
+    document.getElementById('edit-id').value = match.id;
+    document.getElementById('edit-name').value = match.name;
+    document.getElementById('edit-location').value = match.location;
+
+    const date = new Date(match.checkin_time);
+    document.getElementById('edit-date').value = date.toISOString().split('T')[0];
+    document.getElementById('edit-checkin').value = date.toTimeString().slice(0, 5);
+
+    const kickoff = new Date(match.kickoff_time);
+    document.getElementById('edit-kickoff').value = kickoff.toTimeString().slice(0, 5);
+
+    document.getElementById('edit-comment').value = match.comment || '';
+
+    // Dynamisch de actie-URL van het formulier zetten
+    const form = document.getElementById('edit-match-form');
+    form.action = `/admin/match/${match.id}/update`; // of route('matches.update', match.id) als je een route helper gebruikt
+
+    modal.show();
 }
 
 function confirmUnsubscribe(matchId) {

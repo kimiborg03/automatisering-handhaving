@@ -44,6 +44,8 @@ Route::post('/admin/match/{id}/set-deadline-now', [MatchController::class, 'setD
 
 Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
 
+Route::put('/admin/match/{match}/update', [MatchController::class, 'update'])->name('admin.matches.update');
+
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
 

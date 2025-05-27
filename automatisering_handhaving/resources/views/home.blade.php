@@ -8,7 +8,7 @@
             {!! json_encode($allMatches) !!}
         </script>
     @push('scripts')
-        <script src="{{ asset('js/home.js') }}"></script>
+        <script src="{{ asset('js/category.js') }}"></script>
     @endpush
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/home.css') }}">
