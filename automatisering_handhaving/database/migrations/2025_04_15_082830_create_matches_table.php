@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('users')->nullable();
             $table->integer('limit')->nullable();
             $table->string('deadline')->nullable();
+            $table->json('groups')->nullable();
             $table->timestamps();
         });
         
