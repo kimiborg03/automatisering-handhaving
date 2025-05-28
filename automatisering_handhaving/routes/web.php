@@ -23,27 +23,37 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Register routes (public)
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
+// routes for logged in users
+Route::middleware('auth')->group(function () {
 
-// Home route (authenticated)
-Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name('home');
+    // Home route (authenticated)
+    Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name('home');
 
-// Match routes
-Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
-Route::get('/matches', [MatchController::class, 'store']); // Optional: waarom GET voor store?
-Route::get('/admin/add-match', [MatchController::class, 'show'])->name('admin.add-match');
-Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
-Route::post('/match/{matchId}/update', action: [MatchController::class, 'updateMatch']);
+    // Match routes
+    Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+    Route::get('/matches', [MatchController::class, 'store']); // Optional: waarom GET voor store?
+    Route::get('/admin/add-match', [MatchController::class, 'show'])->name('admin.add-match');
+    Route::post('/match/{matchId}/user/remove', [MatchController::class, 'deleteUserFromMatch']);
+    Route::post('/match/{matchId}/update', action: [MatchController::class, 'updateMatch']);
 
-// Category routes
-Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
-Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
+    // Category routes
+    Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
+    Route::get('/load-matches', [CategoryController::class, 'loadMatches'])->name('matches.load');
 
-Route::post('/admin/match/{id}/set-deadline-now', [MatchController::class, 'setDeadlineToNow'])->middleware('auth');
+    // deadline routes
+    Route::post('/admin/match/{id}/set-deadline-now', [MatchController::class, 'setDeadlineToNow'])->middleware('auth');
+    Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
 
-Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
+    // Route for the account page
+    Route::get('/account', function () {return view('account');})->name('account');
+
+    // password setup route
+    Route::get('/password/setup/{token}', [RegisterController::class, 'showPasswordSetupForm'])->name('password.setup.form')->middleware('signed');
+    // save password route
+    Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');
+});
+
+
 
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -68,6 +78,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // route for the register page
     Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [RegisterController::class, 'register']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
     // page for match registrations
     Route::get('/matches/{match}/registrations', [MatchController::class, 'showRegistrations'])->name('matches.registrations');
     Route::post('/matches/{match}/presence', [MatchController::class, 'updatePresence']);
@@ -75,12 +87,3 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // route for downloading excel file of match registrations   
     Route::get('/matches/{match}/export-excel', [MatchController::class, 'exportExcel'])->name('matches.exportExcel');
 });
-
-// Route for the account page
-Route::get('/account', function () {return view('account');})->name('account');
-
-// password setup route
-Route::get('/password/setup/{token}', [RegisterController::class, 'showPasswordSetupForm'])->name('password.setup.form')->middleware('signed');
-// save password route
-Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');
-
