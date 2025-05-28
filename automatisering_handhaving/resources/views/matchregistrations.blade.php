@@ -27,6 +27,11 @@
 @section('content')
 <div class="container">
     <h2>{{ $match->name }}</h2>
+    <div class="text-center">
+        <a href="{{ route('matches.exportExcel', $match->id) }}" class="btn btn-success mb-3">
+            <i class="bi bi-file-earmark-excel"></i> Download Excel
+        </a>
+    </div>
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-dark">
             <tr>
