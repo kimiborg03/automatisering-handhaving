@@ -15,10 +15,9 @@ class CategoryController extends Controller
     {
         $userId = Auth::id();
 
-        $matches = MatchService::getMatchesForUser($userId);
-        $matches = Matches::all(); // of met paginate()
+        $matchData = MatchService::getMatchesForUser($userId);
         $groups = Groups::withCount('users')->get();
-        $availableMatches = $matches['availableMatches'];
+        $availableMatches = $matchData['availableMatches'];
         $allMatches = Matches::where('category', $category)->get(); // Pas dit aan naar jouw logica
         return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
     }
