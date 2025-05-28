@@ -53,8 +53,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');
 });
 
-
-
 // Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
 
@@ -86,4 +84,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // route for downloading excel file of match registrations   
     Route::get('/matches/{match}/export-excel', [MatchController::class, 'exportExcel'])->name('matches.exportExcel');
+    // route for deleting a match
+    Route::post('/admin/match/{id}/delete', [MatchController::class, 'deleteMatch'])->middleware('auth');
+    // route for removing a deadline
+    Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
+    // route for updating a match
+    Route::put('/admin/match/{match}/update', [MatchController::class, 'update'])->name('admin.matches.update');
 });
