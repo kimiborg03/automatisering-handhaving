@@ -149,7 +149,7 @@ class MatchController extends Controller
             'kickoff_time' => $kickoffTime,
             'category' => $request->input('category'),
             'limit' => $request->input('Limit'),
-            'deadline' => $deadline,
+            'deadline' => null,
             'comment' => $request->input('comment'),
             'users' => json_encode($userData),
             'groups' => $validated['groups'] ?? [],
@@ -160,6 +160,9 @@ class MatchController extends Controller
 
     public function update(Request $request, $id)
     {
+        logger()->info('--- Match Update Debug ---');
+        logger()->info('Request data:', $request->all());
+
         $request->validate([
             'name-match' => 'required|string|max:255',
             'location' => 'required|string|max:255',
@@ -174,15 +177,20 @@ class MatchController extends Controller
         ]);
 
         $match = Matches::findOrFail($id);
+        logger()->info('Loaded match:', $match->toArray());
+
         $checkin = $request->input('date') . ' ' . $request->input('check-in-time');
         $kickoff = $request->input('date') . ' ' . $request->input('kick-off-time');
         $groupIds = $request->input('groups');
+        logger()->info('Group IDs:', $groupIds);
+
         $users = User::whereIn('group_id', $groupIds)->get()->map(function ($user) {
             return [
                 'user_id' => $user->id,
                 'presence' => false,
             ];
         });
+        logger()->info('Users for match:', $users->toArray());
 
         $match->users = json_encode($users);
         $match->name = $request->input('name-match');
@@ -192,7 +200,10 @@ class MatchController extends Controller
         $match->category = $request->input('category');
         $match->limit = $request->input('Limit');
         $match->comment = $request->input('comment');
-        $match->save();
+
+        $saveSuccess = $match->save();
+        logger()->info('Save success:', ['success' => $saveSuccess]);
+        logger()->info('Updated match:', $match->toArray());
 
         return redirect()->back()->with('success', 'Wedstrijd succesvol bijgewerkt.');
     }
