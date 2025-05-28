@@ -221,6 +221,15 @@ function openEditMatchModal(match) {
         saveBtn.addEventListener('click', function (e) {
             e.preventDefault();
 
+            // Before submitting, update the hidden groups input with checked values
+            const groupsContainer = document.getElementById('edit-groups-container');
+            if (groupsContainer) {
+                const hiddenGroupsInput = document.getElementById('edit-groups-hidden');
+                if (hiddenGroupsInput) {
+                    hiddenGroupsInput.value = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
+                }
+            }
+
             // No need to manually hide the previous modal here; handled in showConfirmationModal
             const openModalEl = document.querySelector('.modal.show');
             if (openModalEl) {
@@ -253,6 +262,73 @@ function openEditMatchModal(match) {
 
     const form = document.getElementById('edit-match-form');
     form.action = `/admin/match/${match.id}/update`;
+
+    // --- GROUPS FIELD LOGIC ---
+    // Assume allGroups is available globally or via a hidden field (like in add-match.blade.php)
+    // Example: window.allGroups = [{id: 1, name: "A"}, ...]
+    let allGroups = window.allGroups;
+    if (!allGroups && document.getElementById('all-groups')) {
+        allGroups = JSON.parse(document.getElementById('all-groups').textContent);
+    }
+    // Parse match.groups (could be array or JSON string)
+    let selectedGroups = [];
+    if (match.groups) {
+        if (Array.isArray(match.groups)) {
+            selectedGroups = match.groups;
+        } else {
+            try {
+                selectedGroups = JSON.parse(match.groups);
+            } catch (e) {
+                selectedGroups = [];
+            }
+        }
+    }
+    // Render checkboxes
+    const groupsContainer = document.getElementById('edit-groups-container');
+    if (groupsContainer && allGroups) {
+        groupsContainer.innerHTML = '';
+        allGroups.forEach(group => {
+            const checkboxId = `edit-group${group.id}`;
+            const checked = selectedGroups.includes(group.id) ? 'checked' : '';
+            groupsContainer.innerHTML += `
+            <div class="form-check form-check-inline">
+            <input class="form-check-input edit-group-checkbox" type="checkbox" name="groups[]" id="${checkboxId}" value="${group.id}" ${checked}>
+                <label class="form-check-label" for="${checkboxId}">${group.name}</label>
+            </div>
+        `;
+        });
+
+        // Add a hidden input to store selected group IDs
+        // Add a hidden input to store selected group IDs
+        let hiddenGroupsInput = document.getElementById('edit-groups-hidden');
+        if (!hiddenGroupsInput) {
+            hiddenGroupsInput = document.createElement('input');
+            hiddenGroupsInput.type = 'hidden';
+            hiddenGroupsInput.name = 'groups[]'; // <-- verander dit van 'groups' naar 'groups[]'
+            hiddenGroupsInput.id = 'edit-groups-hidden';
+            groupsContainer.appendChild(hiddenGroupsInput);
+        }
+        // Set initial value
+        const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
+        // hiddenGroupsInput.value = JSON.stringify(checkedValues);
+        hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
+
+        // Listen for changes on checkboxes to update hidden input
+        groupsContainer.querySelectorAll('.edit-group-checkbox').forEach(cb => {
+            cb.addEventListener('change', function () {
+                const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
+                // Always set as JSON array string, even if empty
+                hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
+            });
+        });
+
+        // Ensure hidden input is always submitted, even if no boxes are checked
+        // This is needed because unchecked checkboxes are not sent in form data
+        groupsContainer.closest('form').addEventListener('submit', function () {
+            const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
+            hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
+        });
+    }
 
     // Add delete button if not already present
     let deleteBtn = document.getElementById('delete-match-btn');
@@ -312,7 +388,7 @@ function openEditMatchModal(match) {
                         }
                     })
                     .then(res => res.json())
-                    .then(data => {
+                        .then(() => {
                         modal.hide();
                         location.reload();
                     })
