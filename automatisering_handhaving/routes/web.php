@@ -72,6 +72,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // route for the register page
     Route::get('/admin/register', [RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [RegisterController::class, 'register']);
+    // page for match registrations
+    Route::get('/matches/{match}/registrations', [MatchController::class, 'showRegistrations'])->name('matches.registrations');
+    Route::post('/matches/{match}/presence', [MatchController::class, 'updatePresence']);
+
+    // route for downloading excel file of match registrations   
+    Route::get('/matches/{match}/export-excel', [MatchController::class, 'exportExcel'])->name('matches.exportExcel');
 });
 
 // Route for the account page

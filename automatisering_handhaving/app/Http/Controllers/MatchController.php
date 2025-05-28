@@ -11,11 +11,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/** @var \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard $guard */
-
 class MatchController extends Controller
 {
-
     public function deleteMatch(Request $request, $id)
     {
         $match = Matches::findOrFail($id);
@@ -27,14 +24,7 @@ class MatchController extends Controller
     public function setDeadlineToNow(Request $request, $id)
     {
         $guard = Auth::guard();
-
         $user = $guard->user();
-
-        // $user = auth()->user();
-
-        // if (!$user->is_admin) {
-        //     abort(403, 'Unauthorized');
-        // }
 
         $match = Matches::findOrFail($id);
         $match->deadline = now();
@@ -42,16 +32,15 @@ class MatchController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
     public function removeDeadline(Request $request, $id)
     {
-
         $match = Matches::findOrFail($id);
         $match->deadline = null;
         $match->save();
 
         return response()->json(['status' => 'success']);
     }
-
 
     public function updateMatch(Request $request, $matchId)
     {
@@ -144,7 +133,6 @@ class MatchController extends Controller
                 ->withErrors(['Limit' => "Het totaal aantal geselecteerde gebruikers ($totalUsers) is groter dan het limiet ($limit)."]);
         }
 
-
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
@@ -152,7 +140,6 @@ class MatchController extends Controller
             ];
         });
 
-        // Bereken deadline als die niet is meegegeven
         $deadline = $validated['deadline'] ?? Carbon::parse($checkinTime)->subDays(3)->format('Y-m-d H:i:s');
 
         Matches::create([
@@ -173,7 +160,6 @@ class MatchController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validatie
         $request->validate([
             'name-match' => 'required|string|max:255',
             'location' => 'required|string|max:255',
@@ -187,10 +173,7 @@ class MatchController extends Controller
             'groups.*' => 'integer|exists:groups,id',
         ]);
 
-        // Vind de match
         $match = Matches::findOrFail($id);
-
-        // Combineer datum en tijd tot datetime
         $checkin = $request->input('date') . ' ' . $request->input('check-in-time');
         $kickoff = $request->input('date') . ' ' . $request->input('kick-off-time');
         $groupIds = $request->input('groups');
@@ -201,28 +184,87 @@ class MatchController extends Controller
             ];
         });
 
-        // Update velden
         $match->users = json_encode($users);
-
         $match->name = $request->input('name-match');
         $match->location = $request->input('location');
         $match->checkin_time = $checkin;
         $match->kickoff_time = $kickoff;
         $match->category = $request->input('category');
-        $match->limit = $request->input('Limit');  // Hoofdletter omdat dat ook in je form zo is
+        $match->limit = $request->input('Limit');
         $match->comment = $request->input('comment');
-
-        // Opslaan
         $match->save();
 
-        // Redirect terug met succesmelding
         return redirect()->back()->with('success', 'Wedstrijd succesvol bijgewerkt.');
     }
 
     public function show()
     {
         $groups = Groups::withCount('users')->get();
-
         return view('admin.add-match', compact('groups'));
+    }
+
+    public function showRegistrations($matchId)
+    {
+        $match = Matches::findOrFail($matchId);
+        $users = json_decode($match->users, true) ?? [];
+
+        $userIds = collect($users)->pluck('user_id')->all();
+        $userDetails = User::whereIn('id', $userIds)->get();
+
+        $groups = Groups::pluck('name', 'id');
+
+        return view('matchregistrations', compact('match', 'users', 'userDetails', 'groups'));
+    }
+
+    public function updatePresence(Request $request, $matchId)
+    {
+        $match = Matches::findOrFail($matchId);
+        $users = json_decode($match->users, true) ?? [];
+
+        foreach ($users as &$user) {
+            if ($user['user_id'] == $request->user_id) {
+                $user['presence'] = (bool)$request->presence;
+                break;
+            }
+        }
+
+        $match->users = json_encode($users);
+        $match->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function exportExcel($matchId)
+    {
+        $match = Matches::findOrFail($matchId);
+        $users = json_decode($match->users, true) ?? [];
+        $userIds = array_column($users, 'user_id');
+        $userDetails = User::whereIn('id', $userIds)->orderBy('name')->get();
+        $groups = Groups::pluck('name', 'id');
+
+        $cleanName = preg_replace('/[^A-Za-z0-9_\-]/', '_', strtolower($match->name));
+        $filename = 'deelnemers_' . $cleanName . '_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($userDetails, $groups) {
+            $handle = fopen('php://output', 'w');
+
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['Naam', 'Klas']);
+
+            foreach ($userDetails as $user) {
+                fputcsv($handle, [
+                    $user->name,
+                    $groups[$user->group_id] ?? '-',
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
