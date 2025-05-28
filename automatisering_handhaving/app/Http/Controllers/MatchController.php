@@ -10,28 +10,38 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-    /** @var \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard $guard */
+
+/** @var \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard $guard */
 
 class MatchController extends Controller
 {
-public function setDeadlineToNow(Request $request, $id)
-{
-$guard = Auth::guard();
 
-$user = $guard->user();
+    public function deleteMatch(Request $request, $id)
+    {
+        $match = Matches::findOrFail($id);
+        $match->delete();
 
-    // $user = auth()->user();
+        return response()->json(['status' => 'match_deleted', 'match_id' => $id]);
+    }
 
-    // if (!$user->is_admin) {
-    //     abort(403, 'Unauthorized');
-    // }
+    public function setDeadlineToNow(Request $request, $id)
+    {
+        $guard = Auth::guard();
 
-    $match = Matches::findOrFail($id);
-    $match->deadline = now();
-    $match->save();
+        $user = $guard->user();
 
-    return response()->json(['status' => 'success']);
-}
+        // $user = auth()->user();
+
+        // if (!$user->is_admin) {
+        //     abort(403, 'Unauthorized');
+        // }
+
+        $match = Matches::findOrFail($id);
+        $match->deadline = now();
+        $match->save();
+
+        return response()->json(['status' => 'success']);
+    }
     public function removeDeadline(Request $request, $id)
     {
 
@@ -159,34 +169,60 @@ $user = $guard->user();
         ]);
 
         return redirect()->route('admin.add-match')->with('success', "Wedstrijd '{$request->input('name-match')}' is succesvol toegevoegd!");
-
-    
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        // Validatie
+        $validated = $request->validate([
+            'name-match' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            // voeg hier eventueel extra validatie toe
+            'date' => 'required|date',
+            'check-in-time' => 'required|date_format:H:i',
+            'kick-off-time' => 'required|date_format:H:i',
+            'category' => 'required|string',
+            'Limit' => 'nullable|integer|min:1',
+            'comment' => 'nullable|string|max:1000',
+            'groups' => 'required|array',
+            'groups.*' => 'integer|exists:groups,id',
         ]);
 
+        // Vind de match
         $match = Matches::findOrFail($id);
 
-        $match->name = $request->input('name');
+        // Combineer datum en tijd tot datetime
+        $checkin = $request->input('date') . ' ' . $request->input('check-in-time');
+        $kickoff = $request->input('date') . ' ' . $request->input('kick-off-time');
+        $groupIds = $request->input('groups');
+        $users = User::whereIn('group_id', $groupIds)->get()->map(function ($user) {
+            return [
+                'user_id' => $user->id,
+                'presence' => false,
+            ];
+        });
+
+        // Update velden
+        $match->users = $users;
+
+        $match->name = $request->input('name-match');
         $match->location = $request->input('location');
-        // voeg hier andere velden toe
+        $match->checkin_time = $checkin;
+        $match->kickoff_time = $kickoff;
+        $match->category = $request->input('category');
+        $match->limit = $request->input('Limit');  // Hoofdletter omdat dat ook in je form zo is
+        $match->comment = $request->input('comment');
+
+        // Opslaan
         $match->save();
 
+        // Redirect terug met succesmelding
         return redirect()->back()->with('success', 'Wedstrijd succesvol bijgewerkt.');
     }
 
-    public function show(){
+    public function show()
+    {
         $groups = Groups::withCount('users')->get();
 
         return view('admin.add-match', compact('groups'));
     }
-
-    
 }
-

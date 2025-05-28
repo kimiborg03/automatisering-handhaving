@@ -3,9 +3,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Matches;
+use App\Models\Groups;
 use App\Services\MatchService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -14,14 +16,20 @@ class CategoryController extends Controller
         $userId = Auth::id();
 
         $matches = MatchService::getMatchesForUser($userId);
+        $matches = Matches::all(); // of met paginate()
+        $groups = Groups::withCount('users')->get();
         $availableMatches = $matches['availableMatches'];
         $allMatches = Matches::where('category', $category)->get(); // Pas dit aan naar jouw logica
-        return view('category', compact('allMatches', 'category', 'availableMatches'));
+        return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
     }
 
     public function loadMatches(Request $request)
     {
+
         $category = $request->input('category');
+        if ($category === 'null') {
+            $category = null;
+        }
         $offset = $request->input('offset', 0);
         $userId = Auth::id();
 
@@ -31,14 +39,21 @@ class CategoryController extends Controller
             'user_id' => $userId
         ]);
 
-        // Tijdelijk zonder filter
-        $matches = Matches::where('category', $category)
-            ->where('checkin_time', '>=', now())
+        DB::enableQueryLog();
+
+        $matchesQuery = Matches::where('checkin_time', '>=', now());
+
+        if ($category !== null && $category !== '') {
+            $matchesQuery->where('category', $category);
+        }
+
+        $matches = $matchesQuery
             ->orderBy('checkin_time', 'asc')
             ->offset($offset)
             ->limit(12)
             ->get();
 
+        Log::info(DB::getQueryLog());
 
         return response()->json($matches);
     }
