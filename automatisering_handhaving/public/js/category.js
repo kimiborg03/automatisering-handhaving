@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="card-body">
                                 <h5 class="card-title">${match.name}</h5>
                                 <p class="card-text mb-1"><strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}</p>
-                                <p class="card-text mb-1"><strong>Deadline:</strong> ${new Date(match.deadline).toLocaleDateString()}</p>
+
                                 <p class="card-text mb-1"><strong>Locatie:</strong> ${match.location}</p>
                                 <p class="card-text mb-1"><strong>Check-in:</strong> ${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                 <p class="card-text mb-2"><strong>Aftrap:</strong> ${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -131,6 +131,202 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 });
+// Reusable confirmation modal logic
+function showConfirmationModal({
+    title = "Bevestigen",
+    message = "Weet je het zeker?",
+    confirmText = "Bevestigen",
+    cancelText = "Annuleren",
+    onConfirm,
+    confirmBtnClass = "btn-danger",
+    cancelBtnClass = "btn-secondary"
+}) {
+    // Hide any currently open modal before showing the confirmation modal
+    const openModalEl = document.querySelector('.modal.show');
+    let modalEl = document.getElementById('confirmationModal');
+    if (openModalEl && (!modalEl || openModalEl !== modalEl)) {
+        const openModalInstance = bootstrap.Modal.getInstance(openModalEl);
+        if (openModalInstance) openModalInstance.hide();
+    }
+
+    if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.className = 'modal fade';
+        modalEl.id = 'confirmationModal';
+        modalEl.tabIndex = -1;
+        modalEl.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                    </div>
+                    <div class="modal-body" id="confirmationModalBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-bs-dismiss="modal" id="confirmationModalCancel"></button>
+                        <button type="button" class="btn" id="confirmationModalConfirm"></button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalEl);
+    }
+    document.getElementById('confirmationModalLabel').innerText = title;
+    document.getElementById('confirmationModalBody').innerText = message;
+
+    const cancelBtn = document.getElementById('confirmationModalCancel');
+    const confirmBtn = document.getElementById('confirmationModalConfirm');
+
+    cancelBtn.innerText = cancelText;
+    confirmBtn.innerText = confirmText;
+
+    // Set button classes
+    cancelBtn.className = `btn ${cancelBtnClass}`;
+    confirmBtn.className = `btn ${confirmBtnClass}`;
+
+    // Remove previous event listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.onclick = function () {
+        if (typeof onConfirm === 'function') onConfirm();
+        bootstrap.Modal.getInstance(modalEl).hide();
+    };
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+function openEditMatchModal(match) {
+    const modal = new bootstrap.Modal(document.getElementById('editMatchModal'));
+    // Hide any currently open modal before showing the edit modal
+    const openModalEl = document.querySelector('.modal.show');
+    if (openModalEl) {
+        const openModalInstance = bootstrap.Modal.getInstance(openModalEl);
+        if (openModalInstance) {
+            openModalInstance.hide();
+        }
+    }
+    document.getElementById('edit-id').value = match.id;
+    document.getElementById('edit-name').value = match.name;
+    document.getElementById('edit-location').value = match.location;
+
+    const date = new Date(match.checkin_time);
+    document.getElementById('edit-date').value = date.toISOString().split('T')[0];
+
+    // Intercept form submit for confirmation modal
+    const saveBtn = document.querySelector('#editMatchModal .modal-footer button[type="submit"], #edit-match-form button[type="submit"]');
+    if (saveBtn && !saveBtn._confirmationAttached) {
+        saveBtn._confirmationAttached = true;
+        saveBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // No need to manually hide the previous modal here; handled in showConfirmationModal
+            const openModalEl = document.querySelector('.modal.show');
+            if (openModalEl) {
+                const openModalInstance = bootstrap.Modal.getInstance(openModalEl);
+                if (openModalInstance) {
+                    openModalInstance.hide();
+                }
+            }
+
+            showConfirmationModal({
+                title: "Wedstrijd opslaan",
+                message: "Weet je zeker dat je de wijzigingen wilt opslaan?",
+                confirmText: "Opslaan",
+                cancelText: "Annuleren",
+                confirmBtnClass: "btn-primary",
+                onConfirm: function () {
+                    form.submit();
+                }
+            });
+        });
+    }
+    document.getElementById('edit-checkin').value = date.toTimeString().slice(0, 5);
+
+    const kickoff = new Date(match.kickoff_time);
+    document.getElementById('edit-kickoff').value = kickoff.toTimeString().slice(0, 5);
+
+    document.getElementById('edit-category').value = match.category || 'Overige';
+    document.getElementById('edit-limit').value = match.limit || '';
+    document.getElementById('edit-comment').value = match.comment || '';
+
+    const form = document.getElementById('edit-match-form');
+    form.action = `/admin/match/${match.id}/update`;
+
+    // Add delete button if not already present
+    let deleteBtn = document.getElementById('delete-match-btn');
+    if (!deleteBtn) {
+        deleteBtn = document.createElement('button');
+        deleteBtn.id = 'delete-match-btn';
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-danger mt-3';
+        deleteBtn.innerText = 'Wedstrijd verwijderen';
+        deleteBtn.onclick = function () {
+            showConfirmationModal({
+                title: "Wedstrijd verwijderen",
+                message: "Weet je zeker dat je deze wedstrijd wilt verwijderen?",
+                confirmText: "Verwijderen",
+                cancelText: "Annuleren",
+                onConfirm: function () {
+                    fetch(`/admin/match/${match.id}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(() => {
+                        modal.hide();
+                        location.reload();
+                    })
+                    .catch(err => {
+                        alert('Fout bij verwijderen van wedstrijd.');
+                        console.error(err);
+                    });
+                }
+            });
+        };
+        // Add the button to the modal footer or form
+        const modalFooter = document.querySelector('#editMatchModal .modal-footer');
+        if (modalFooter) {
+            modalFooter.appendChild(deleteBtn);
+        } else {
+            form.appendChild(deleteBtn);
+        }
+    } else {
+        // Update the onclick handler in case match.id changed
+        deleteBtn.onclick = function () {
+            showConfirmationModal({
+                title: "Wedstrijd verwijderen",
+                message: "Weet je zeker dat je deze wedstrijd wilt verwijderen?",
+                confirmText: "Verwijderen",
+                cancelText: "Annuleren",
+                onConfirm: function () {
+                    fetch(`/admin/match/${match.id}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        modal.hide();
+                        location.reload();
+                    })
+                    .catch(err => {
+                        alert('Fout bij verwijderen van wedstrijd.');
+                        console.error(err);
+                    });
+                }
+            });
+        };
+    }
+
+    modal.show();
+}
 const allMatches = JSON.parse(document.getElementById('all-matches').textContent);
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -139,6 +335,17 @@ let selectedSwap = {
     toMatch: null
 };
 function openMatchModal(match, showRuilButton) {
+    document.querySelectorAll('#edit-groups-container input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+
+    // Zet de juiste vinkjes aan
+    if (Array.isArray(match.groups)) {
+        match.groups.forEach(groupId => {
+            const checkbox = document.querySelector(`#edit-group${groupId}`);
+            if (checkbox) checkbox.checked = true;
+        });
+    }
     console.log("Show ruil button?", showRuilButton); // Add this to debug
 
     let matchUsers = Array.isArray(match.users) ? match.users : JSON.parse(match.users);
@@ -153,7 +360,6 @@ function openMatchModal(match, showRuilButton) {
     const body = document.getElementById('modal-content-body');
     let stringThing = `
             <p><strong>Naam:</strong> ${match.name}</p>
-            <p><strong>Deadline:</strong> ${match.deadline}</p>
             <p><strong>Datum:</strong> ${formatUtc(match.checkin_time)}</p>
             <p><strong>Locatie:</strong> ${match.location}</p>
             <p><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
@@ -176,6 +382,7 @@ function openMatchModal(match, showRuilButton) {
     //             </button>
     //         `;
     // }
+    if (showRuilButton == true) {
     const deadlineIsNull = match.deadline === null || match.deadline === "null";
 
     if (deadlineIsNull) {
@@ -193,39 +400,54 @@ function openMatchModal(match, showRuilButton) {
             console.log("Deadline is null?", deadlineIsNull);
 
             const matchData = encodeURIComponent(JSON.stringify(match));
+
             stringThing += `
-            <button class="btn btn-outline-warning btn-sm w-100 mt-2"
-                data-bs-toggle="modal"
-                data-bs-target="#swapModal"
-                onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
-                Wedstrijd Ruilen
-            </button>
-            <button class="btn btn-outline-danger btn-sm w-100 mt-2"
-                onclick="confirmUnsubscribe(${match.id})">
-                Afmelden
-            </button>
-        `;
+        <button
+            class="btn btn-outline-warning btn-sm w-100 mt-2"
+            data-bs-toggle="modal"
+            data-bs-target="#swapModal"
+            onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))'>
+            Wedstrijd Ruilen
+        </button>
+        <button
+            class="btn btn-outline-danger btn-sm w-100 mt-2"
+            onclick="confirmUnsubscribe(${match.id})">
+            Afmelden
+        </button>
+    `;
         }
+    } else {
+        stringThing += `
+        <p class="text-danger fw-bold fs-5 w-100 mt-2">
+            Aanmelding is GESLOTEN!
+        </p>        `
     }
     const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
 
     if (isAdmin) {
+        stringThing += `
+<button class="btn btn-outline-primary btn-sm w-100 mt-2"
+    onclick='openEditMatchModal(${JSON.stringify(match)})'>
+    Bewerken
+</button>
+`;
         if (deadlineIsNull) {
             stringThing += `
     <button class="btn btn-outline-dark btn-sm w-100 mt-2 set-deadline-btn"
         data-match-id="${match.id}">
-        Sluit deadline
+        Aanmelding sluiten
     </button>
         `;
         } else {
             stringThing += `
 <button class="btn btn-outline-dark btn-sm w-100 mt-2 remove-deadline-btn"
     data-match-id="${match.id}">
-    Verwijder deadline
+    Aanmelding openen
 </button>
         `;
         }
 
+    }
     }
     body.innerHTML = stringThing;
 
