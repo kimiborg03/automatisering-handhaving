@@ -132,8 +132,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 // Reusable confirmation modal logic
-function showConfirmationModal({ title = "Bevestigen", message = "Weet je het zeker?", confirmText = "Bevestigen", cancelText = "Annuleren", onConfirm }) {
+function showConfirmationModal({
+    title = "Bevestigen",
+    message = "Weet je het zeker?",
+    confirmText = "Bevestigen",
+    cancelText = "Annuleren",
+    onConfirm,
+    confirmBtnClass = "btn-danger",
+    cancelBtnClass = "btn-secondary"
+}) {
+    // Hide any currently open modal before showing the confirmation modal
+    const openModalEl = document.querySelector('.modal.show');
     let modalEl = document.getElementById('confirmationModal');
+    if (openModalEl && (!modalEl || openModalEl !== modalEl)) {
+        const openModalInstance = bootstrap.Modal.getInstance(openModalEl);
+        if (openModalInstance) openModalInstance.hide();
+    }
+
     if (!modalEl) {
         modalEl = document.createElement('div');
         modalEl.className = 'modal fade';
@@ -148,8 +163,8 @@ function showConfirmationModal({ title = "Bevestigen", message = "Weet je het ze
                     </div>
                     <div class="modal-body" id="confirmationModalBody"></div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmationModalCancel"></button>
-                        <button type="button" class="btn btn-danger" id="confirmationModalConfirm"></button>
+                        <button type="button" class="btn" data-bs-dismiss="modal" id="confirmationModalCancel"></button>
+                        <button type="button" class="btn" id="confirmationModalConfirm"></button>
                     </div>
                 </div>
             </div>
@@ -158,15 +173,22 @@ function showConfirmationModal({ title = "Bevestigen", message = "Weet je het ze
     }
     document.getElementById('confirmationModalLabel').innerText = title;
     document.getElementById('confirmationModalBody').innerText = message;
-    document.getElementById('confirmationModalCancel').innerText = cancelText;
-    document.getElementById('confirmationModalConfirm').innerText = confirmText;
+
+    const cancelBtn = document.getElementById('confirmationModalCancel');
+    const confirmBtn = document.getElementById('confirmationModalConfirm');
+
+    cancelBtn.innerText = cancelText;
+    confirmBtn.innerText = confirmText;
+
+    // Set button classes
+    cancelBtn.className = `btn ${cancelBtnClass}`;
+    confirmBtn.className = `btn ${confirmBtnClass}`;
 
     // Remove previous event listeners
-    const newConfirmBtn = document.getElementById('confirmationModalConfirm');
-    const oldConfirmBtn = newConfirmBtn.cloneNode(true);
-    newConfirmBtn.parentNode.replaceChild(oldConfirmBtn, newConfirmBtn);
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
-    oldConfirmBtn.onclick = function () {
+    newConfirmBtn.onclick = function () {
         if (typeof onConfirm === 'function') onConfirm();
         bootstrap.Modal.getInstance(modalEl).hide();
     };
@@ -191,6 +213,35 @@ function openEditMatchModal(match) {
 
     const date = new Date(match.checkin_time);
     document.getElementById('edit-date').value = date.toISOString().split('T')[0];
+
+    // Intercept form submit for confirmation modal
+    const saveBtn = document.querySelector('#editMatchModal .modal-footer button[type="submit"], #edit-match-form button[type="submit"]');
+    if (saveBtn && !saveBtn._confirmationAttached) {
+        saveBtn._confirmationAttached = true;
+        saveBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // No need to manually hide the previous modal here; handled in showConfirmationModal
+            const openModalEl = document.querySelector('.modal.show');
+            if (openModalEl) {
+                const openModalInstance = bootstrap.Modal.getInstance(openModalEl);
+                if (openModalInstance) {
+                    openModalInstance.hide();
+                }
+            }
+
+            showConfirmationModal({
+                title: "Wedstrijd opslaan",
+                message: "Weet je zeker dat je de wijzigingen wilt opslaan?",
+                confirmText: "Opslaan",
+                cancelText: "Annuleren",
+                confirmBtnClass: "btn-primary",
+                onConfirm: function () {
+                    form.submit();
+                }
+            });
+        });
+    }
     document.getElementById('edit-checkin').value = date.toTimeString().slice(0, 5);
 
     const kickoff = new Date(match.kickoff_time);
@@ -226,7 +277,7 @@ function openEditMatchModal(match) {
                         }
                     })
                     .then(res => res.json())
-                    .then(data => {
+                    .then(() => {
                         modal.hide();
                         location.reload();
                     })

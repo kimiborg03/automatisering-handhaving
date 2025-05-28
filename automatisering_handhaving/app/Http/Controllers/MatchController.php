@@ -174,7 +174,7 @@ class MatchController extends Controller
     public function update(Request $request, $id)
     {
         // Validatie
-        $validated = $request->validate([
+        $request->validate([
             'name-match' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'date' => 'required|date',
@@ -202,7 +202,7 @@ class MatchController extends Controller
         });
 
         // Update velden
-        $match->users = $users;
+        $match->users = json_encode($users);
 
         $match->name = $request->input('name-match');
         $match->location = $request->input('location');
