@@ -72,6 +72,7 @@ $user = $guard->user();
         return response()->json(['status' => 'already_exists']);
     }
 
+    
     public function deleteUserFromMatch(Request $request, $matchId)
     {
         $match = Matches::findOrFail($matchId);
@@ -101,6 +102,7 @@ $user = $guard->user();
 
         return response()->json(data: ['status' => 'user_removed', 'match_id' => $matchId]);
     }
+
 
     public function store(Request $request)
     {
@@ -133,8 +135,6 @@ $user = $guard->user();
                 ->withInput()
                 ->withErrors(['Limit' => "Het totaal aantal geselecteerde gebruikers ($totalUsers) is groter dan het limiet ($limit)."]);
         }
-
-
         $userData = $users->map(function ($user) {
             return [
                 'user_id' => $user->id,
@@ -157,20 +157,90 @@ $user = $guard->user();
             'users' => json_encode($userData),
             'groups' => $validated['groups'] ?? [],
         ]);
-
         return redirect()->route('admin.add-match')->with('success', "Wedstrijd '{$request->input('name-match')}' is succesvol toegevoegd!");
-
-    
     }
 
 
-
+    // function to show the page for adding a match
     public function show(){
         $groups = Groups::withCount('users')->get();
 
         return view('admin.add-match', compact('groups'));
     }
 
+
+// function for page with registrations for a match
+public function showRegistrations($matchId)
+{
+    $match = \App\Models\Matches::findOrFail($matchId);
+    $users = json_decode($match->users, true) ?? [];
+
+    $userIds = collect($users)->pluck('user_id')->all();
+    $userDetails = \App\Models\User::whereIn('id', $userIds)->get();
+
+    $groups = \App\Models\Groups::pluck('name', 'id');
+
+    return view('matchregistrations', compact('match', 'users', 'userDetails', 'groups'));
+}
+
+
+// function to update the presence of a user in a match
+public function updatePresence(Request $request, $matchId)
+{
+    $match = \App\Models\Matches::findOrFail($matchId);
+    $users = json_decode($match->users, true) ?? [];
+
+    foreach ($users as &$user) {
+        if ($user['user_id'] == $request->user_id) {
+            $user['presence'] = (bool)$request->presence;
+            break;
+        }
+    }
+
+    $match->users = json_encode($users);
+    $match->save();
+
+    return response()->json(['success' => true]);
+}
+
+
+public function exportExcel($matchId)
+{
+    // check if the user is authenticated
+    $match = \App\Models\Matches::findOrFail($matchId);
+    $users = json_decode($match->users, true) ?? [];
+    $userIds = array_column($users, 'user_id');
+    $userDetails = \App\Models\User::whereIn('id', $userIds)->orderBy('name')->get();
+    $groups = \App\Models\Groups::pluck('name', 'id');
+
+    // name the file
+    $cleanName = preg_replace('/[^A-Za-z0-9_\-]/', '_', strtolower($match->name));
+    $filename = 'deelnemers_' . $cleanName . '_' . now()->format('Ymd_His') . '.csv';
+
+    $headers = [
+        'Content-Type' => 'text/csv; charset=UTF-8',
+        'Content-Disposition' => "attachment; filename=\"$filename\"",
+    ];
+
+    $callback = function() use ($userDetails, $groups) {
+        $handle = fopen('php://output', 'w');
+
+        fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+        fputcsv($handle, ['Naam', 'Klas']);
+
+        // Loop user details and write
+        foreach ($userDetails as $user) {
+            fputcsv($handle, [
+                $user->name,
+                $groups[$user->group_id] ?? '-',
+            ]);
+        }
+        fclose($handle);
+    };
+    
+    // Return the response as a stream
+    return response()->stream($callback, 200, $headers);
+}
     
 }
 

@@ -160,6 +160,9 @@ function openMatchModal(match, showRuilButton) {
             <p><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
             <p><strong>Category:</strong> ${match.category}</p>
             <p><strong>Ingeschreven:</strong> ${numberOfUsers} / ${match.limit}</p>
+            <a href="/matches/${match.id}/registrations" class="btn btn-primary mt-3" target="_blank">
+            Bekijk deelnemers
+            </a>
         `;
 
     // if (showRuilButton) {
