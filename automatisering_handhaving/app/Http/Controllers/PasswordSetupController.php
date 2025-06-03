@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+
 class PasswordSetupController extends Controller
 {   
     // show password setup form
@@ -41,4 +42,23 @@ class PasswordSetupController extends Controller
 
         return redirect()->route('home')->with('success', 'Wachtwoord ingesteld en ingelogd!');
     }
+
+    public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|confirmed|min:8',
+    ]);
+
+    $user = Auth::user();
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Huidig wachtwoord klopt niet.']);
+    }
+
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return back()->with('success', 'Wachtwoord succesvol gewijzigd!');
+}
 }
