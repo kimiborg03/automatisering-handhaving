@@ -90,4 +90,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/match/{id}/remove-deadline', [MatchController::class, 'removeDeadline'])->middleware('auth');
     // route for updating a match
     Route::put('/admin/match/{match}/update', [MatchController::class, 'update'])->name('admin.matches.update');
+
+    // route for email settings
+    Route::get('/admin/mail-settings', [\App\Http\Controllers\MailSettingsController::class, 'edit'])->name('admin.mailsettings');
+    Route::post('/admin/mail-settings', [\App\Http\Controllers\MailSettingsController::class, 'update'])->name('admin.mailsettings.update');
 });
