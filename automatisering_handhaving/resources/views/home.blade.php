@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        {{-- Aangemelde Wedstrijden --}}
+        <!-- Aangemelde Wedstrijden -->
         <div class="container mt-4 bg-light rounded p-4">
             <h2 class="mb-4 text-center fw-bold">Aangemelde Wedstrijden</h2>
 
@@ -54,15 +54,15 @@
                 <!-- matches appear here -->
             </div>
 
-            @include('partials.match-modals', ['userId' => auth()->user()->id, 'allMatches' => $allMatches])
+            {{-- @include('partials.match-modals', ['userId' => auth()->user()->id, 'allMatches' => $allMatches]) --}}
         </div>
 
-        {{-- Gespeelde Wedstrijden --}}
+        <!-- Gespeelde Wedstrijden -->
         <div class="container mt-4 bg-light rounded p-4">
-            <h2 class="mb-4 text-center fw-bold">Gespeelde Wedsstrijden</h2>
+            <h2 class="mb-4 text-center fw-bold">Gespeelde Wedstrijden</h2>
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                @foreach ($playedMatches as $match)
+                @forelse ($playedMatches as $match)
                     <div class="col">
                         <div class="card h-100 shadow-sm p-2">
                             <div class="card-body">
@@ -78,14 +78,16 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    {{-- <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            Er zijn nog geen gespeelde wedstrijden.
+                        </div>
+                    </div> --}}
+                @endforelse
             </div>
         </div>
 
-        {{-- Modals --}}
-        @include('partials.match-modals', ['userId' => $userId, 'allMatches' => $allMatches])
-
-            {{-- Scripts --}}
         {{-- Modals --}}
         @include('partials.match-modals', ['userId' => auth()->user()->id, 'allMatches' => $allMatches])
     @endsection

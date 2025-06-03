@@ -214,6 +214,9 @@ function openEditMatchModal(match) {
     const date = new Date(match.checkin_time);
     document.getElementById('edit-date').value = date.toISOString().split('T')[0];
 
+    const form = document.getElementById('edit-match-form');
+    form.action = `/admin/match/${match.id}/update`;
+
     // Intercept form submit for confirmation modal
     const saveBtn = document.querySelector('#editMatchModal .modal-footer button[type="submit"], #edit-match-form button[type="submit"]');
     if (saveBtn && !saveBtn._confirmationAttached) {
@@ -260,9 +263,6 @@ function openEditMatchModal(match) {
     document.getElementById('edit-limit').value = match.limit || '';
     document.getElementById('edit-comment').value = match.comment || '';
 
-    const form = document.getElementById('edit-match-form');
-    form.action = `/admin/match/${match.id}/update`;
-
     // --- GROUPS FIELD LOGIC ---
     // Assume allGroups is available globally or via a hidden field (like in add-match.blade.php)
     // Example: window.allGroups = [{id: 1, name: "A"}, ...]
@@ -270,17 +270,22 @@ function openEditMatchModal(match) {
     if (!allGroups && document.getElementById('all-groups')) {
         allGroups = JSON.parse(document.getElementById('all-groups').textContent);
     }
-    // Parse match.groups (could be array or JSON string)
     let selectedGroups = [];
     if (match.groups) {
-        if (Array.isArray(match.groups)) {
-            selectedGroups = match.groups;
-        } else {
-            try {
-                selectedGroups = JSON.parse(match.groups);
-            } catch (e) {
-                selectedGroups = [];
+        try {
+            const parsed = typeof match.groups === 'string' ? JSON.parse(match.groups) : match.groups;
+            // Als het een array van objecten is (met id), map naar ID’s
+            if (Array.isArray(parsed)) {
+                if (parsed.length && typeof parsed[0] === 'object') {
+                    selectedGroups = parsed.map(g => g.id);
+                } else {
+                    selectedGroups = parsed;
+                }
             }
+            console.log('selectedGroups:', selectedGroups);
+
+        } catch (e) {
+            selectedGroups = [];
         }
     }
     // Render checkboxes
@@ -288,8 +293,11 @@ function openEditMatchModal(match) {
     if (groupsContainer && allGroups) {
         groupsContainer.innerHTML = '';
         allGroups.forEach(group => {
+            console.log('group.id:', group.id, 'selectedGroups:', selectedGroups);
+
             const checkboxId = `edit-group${group.id}`;
-            const checked = selectedGroups.includes(group.id) ? 'checked' : '';
+            // Ensure both are numbers for comparison
+            const checked = selectedGroups.map(String).includes(String(group.id)) ? 'checked' : '';
             groupsContainer.innerHTML += `
             <div class="form-check form-check-inline">
             <input class="form-check-input edit-group-checkbox" type="checkbox" name="groups[]" id="${checkboxId}" value="${group.id}" ${checked}>
@@ -298,35 +306,32 @@ function openEditMatchModal(match) {
         `;
         });
 
-        // Add a hidden input to store selected group IDs
-        // Add a hidden input to store selected group IDs
         let hiddenGroupsInput = document.getElementById('edit-groups-hidden');
         if (!hiddenGroupsInput) {
             hiddenGroupsInput = document.createElement('input');
             hiddenGroupsInput.type = 'hidden';
-            hiddenGroupsInput.name = 'groups[]'; // <-- verander dit van 'groups' naar 'groups[]'
+            hiddenGroupsInput.name = 'groups[]'; // dit moet exact zo
             hiddenGroupsInput.id = 'edit-groups-hidden';
             groupsContainer.appendChild(hiddenGroupsInput);
         }
-        // Set initial value
-        const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
-        // hiddenGroupsInput.value = JSON.stringify(checkedValues);
-        hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
 
-        // Listen for changes on checkboxes to update hidden input
+        const updateHiddenGroupsInput = () => {
+            const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
+            // Altijd het hidden input meesturen, ook als leeg (dan wordt het een lege array)
+            hiddenGroupsInput.value = checkedValues.join(',');
+            hiddenGroupsInput.disabled = false;
+        };
+
+        // Initialiseren + bij checkbox-veranderingen
+        updateHiddenGroupsInput();
         groupsContainer.querySelectorAll('.edit-group-checkbox').forEach(cb => {
-            cb.addEventListener('change', function () {
-                const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
-                // Always set as JSON array string, even if empty
-                hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
-            });
+            cb.addEventListener('change', updateHiddenGroupsInput);
         });
 
-        // Ensure hidden input is always submitted, even if no boxes are checked
-        // This is needed because unchecked checkboxes are not sent in form data
-        groupsContainer.closest('form').addEventListener('submit', function () {
+        form.addEventListener('submit', function () {
             const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
-            hiddenGroupsInput.value = checkedValues; // niet JSON.stringify(checkedValues)
+            hiddenGroupsInput.value = checkedValues.join(',');
+            hiddenGroupsInput.disabled = false;
         });
     }
 
@@ -710,7 +715,8 @@ function confirmAction() {
     console.log("confirmAction gestart!");
     console.log("Verwijderen uit match", fromMatchId, userId);
 
-    fetch(`/match/${fromMatchId}/user/remove`, {
+    // Eerst toevoegen aan nieuwe match, dan pas verwijderen uit oude
+    fetch(`/match/${toMatchId}/update`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -720,12 +726,23 @@ function confirmAction() {
     })
         .then(async res => {
             const text = await res.text();
-            console.log("Remove response:", text);
-            return JSON.parse(text);
+            console.log("Add response:", text);
+            // Controleer of toevoegen gelukt is
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error("Kon response niet parsen: " + text);
+            }
+            if (data.status && data.status === 'full') {
+                alert("De gekozen wedstrijd zit vol. Wissel niet mogelijk.");
+                throw new Error("Wedstrijd vol");
+            }
+            return data;
         })
         .then(() => {
-            console.log("Toevoegen aan match", toMatchId);
-            return fetch(`/match/${toMatchId}/update`, {
+            // Nu pas verwijderen uit oude match
+            return fetch(`/match/${fromMatchId}/user/remove`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -736,7 +753,7 @@ function confirmAction() {
         })
         .then(async res => {
             const text = await res.text();
-            console.log("Add response:", text);
+            console.log("Remove response:", text);
             return JSON.parse(text);
         })
         .then(data => {
