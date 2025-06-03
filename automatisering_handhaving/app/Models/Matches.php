@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Matches extends Model
 {
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'match_user', 'match_id', 'user_id');
+    }
+
     protected $casts = [
         'checkin_time' => 'datetime',
         'kickoff_time' => 'datetime',
