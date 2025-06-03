@@ -53,6 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
+    // Helper function to format UTC date/time
+    function formatUtc(datetime) {
+        const date = new Date(datetime);
+        return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+    }
+
     function loadMatches() {
         console.log('Loading matches... Offset:', offset, 'Category:', category);
 
@@ -92,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <p class="card-text mb-1"><strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}</p>
 
                                 <p class="card-text mb-1"><strong>Locatie:</strong> ${match.location}</p>
-                                <p class="card-text mb-1"><strong>Check-in:</strong> ${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                <p class="card-text mb-2"><strong>Aftrap:</strong> ${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                <p class="card-text mb-1"><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
+                                <p class="card-text mb-2"><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
                             <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
                                 data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
                                 Meer
@@ -263,78 +269,6 @@ function openEditMatchModal(match) {
     document.getElementById('edit-limit').value = match.limit || '';
     document.getElementById('edit-comment').value = match.comment || '';
 
-    // --- GROUPS FIELD LOGIC ---
-    // Assume allGroups is available globally or via a hidden field (like in add-match.blade.php)
-    // Example: window.allGroups = [{id: 1, name: "A"}, ...]
-    let allGroups = window.allGroups;
-    if (!allGroups && document.getElementById('all-groups')) {
-        allGroups = JSON.parse(document.getElementById('all-groups').textContent);
-    }
-    let selectedGroups = [];
-    if (match.groups) {
-        try {
-            const parsed = typeof match.groups === 'string' ? JSON.parse(match.groups) : match.groups;
-            // Als het een array van objecten is (met id), map naar ID’s
-            if (Array.isArray(parsed)) {
-                if (parsed.length && typeof parsed[0] === 'object') {
-                    selectedGroups = parsed.map(g => g.id);
-                } else {
-                    selectedGroups = parsed;
-                }
-            }
-            console.log('selectedGroups:', selectedGroups);
-
-        } catch (e) {
-            selectedGroups = [];
-        }
-    }
-    // Render checkboxes
-    const groupsContainer = document.getElementById('edit-groups-container');
-    if (groupsContainer && allGroups) {
-        groupsContainer.innerHTML = '';
-        allGroups.forEach(group => {
-            console.log('group.id:', group.id, 'selectedGroups:', selectedGroups);
-
-            const checkboxId = `edit-group${group.id}`;
-            // Ensure both are numbers for comparison
-            const checked = selectedGroups.map(String).includes(String(group.id)) ? 'checked' : '';
-            groupsContainer.innerHTML += `
-            <div class="form-check form-check-inline">
-            <input class="form-check-input edit-group-checkbox" type="checkbox" name="groups[]" id="${checkboxId}" value="${group.id}" ${checked}>
-                <label class="form-check-label" for="${checkboxId}">${group.name}</label>
-            </div>
-        `;
-        });
-
-        let hiddenGroupsInput = document.getElementById('edit-groups-hidden');
-        if (!hiddenGroupsInput) {
-            hiddenGroupsInput = document.createElement('input');
-            hiddenGroupsInput.type = 'hidden';
-            hiddenGroupsInput.name = 'groups[]'; // dit moet exact zo
-            hiddenGroupsInput.id = 'edit-groups-hidden';
-            groupsContainer.appendChild(hiddenGroupsInput);
-        }
-
-        const updateHiddenGroupsInput = () => {
-            const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
-            // Altijd het hidden input meesturen, ook als leeg (dan wordt het een lege array)
-            hiddenGroupsInput.value = checkedValues.join(',');
-            hiddenGroupsInput.disabled = false;
-        };
-
-        // Initialiseren + bij checkbox-veranderingen
-        updateHiddenGroupsInput();
-        groupsContainer.querySelectorAll('.edit-group-checkbox').forEach(cb => {
-            cb.addEventListener('change', updateHiddenGroupsInput);
-        });
-
-        form.addEventListener('submit', function () {
-            const checkedValues = Array.from(groupsContainer.querySelectorAll('.edit-group-checkbox:checked')).map(cb => cb.value);
-            hiddenGroupsInput.value = checkedValues.join(',');
-            hiddenGroupsInput.disabled = false;
-        });
-    }
-
     // Add delete button if not already present
     let deleteBtn = document.getElementById('delete-match-btn');
     if (!deleteBtn) {
@@ -357,15 +291,15 @@ function openEditMatchModal(match) {
                             'X-CSRF-TOKEN': csrfToken
                         }
                     })
-                    .then(res => res.json())
-                    .then(() => {
-                        modal.hide();
-                        location.reload();
-                    })
-                    .catch(err => {
-                        alert('Fout bij verwijderen van wedstrijd.');
-                        console.error(err);
-                    });
+                        .then(res => res.json())
+                        .then(() => {
+                            modal.hide();
+                            location.reload();
+                        })
+                        .catch(err => {
+                            alert('Fout bij verwijderen van wedstrijd.');
+                            console.error(err);
+                        });
                 }
             });
         };
@@ -392,15 +326,15 @@ function openEditMatchModal(match) {
                             'X-CSRF-TOKEN': csrfToken
                         }
                     })
-                    .then(res => res.json())
+                        .then(res => res.json())
                         .then(() => {
-                        modal.hide();
-                        location.reload();
-                    })
-                    .catch(err => {
-                        alert('Fout bij verwijderen van wedstrijd.');
-                        console.error(err);
-                    });
+                            modal.hide();
+                            location.reload();
+                        })
+                        .catch(err => {
+                            alert('Fout bij verwijderen van wedstrijd.');
+                            console.error(err);
+                        });
                 }
             });
         };
@@ -434,55 +368,73 @@ function openMatchModal(match, showRuilButton) {
 
     function formatUtc(datetime) {
         const date = new Date(datetime);
-        return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')} ` +
-            `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+        return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
     }
 
     const body = document.getElementById('modal-content-body');
+    function formatDateOnly(datetime) {
+        const date = new Date(datetime);
+        return date.toLocaleDateString();
+    }
+        const deadlineIsNull = match.deadline === null || match.deadline === "null";
+
     let stringThing = `
             <p><strong>Naam:</strong> ${match.name}</p>
-            <p><strong>Datum:</strong> ${formatUtc(match.checkin_time)}</p>
+            <p><strong>Datum:</strong> ${formatDateOnly(match.checkin_time)}</p>
             <p><strong>Locatie:</strong> ${match.location}</p>
             <p><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
             <p><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
             <p><strong>Category:</strong> ${match.category}</p>
             <p><strong>Ingeschreven:</strong> ${numberOfUsers} / ${match.limit}</p>
-            <a href="/matches/${match.id}/registrations" class="btn btn-primary mt-3" target="_blank">
-            Bekijk deelnemers
-            </a>
         `;
+  const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
 
-    // if (showRuilButton) {
-    //     const matchData = encodeURIComponent(JSON.stringify(match));
-    //     stringThing += `
-    //             <button class="btn btn-outline-warning btn-sm w-100 mt-2"
-    //                 data-bs-toggle="modal"
-    //                 data-bs-target="#swapModal"
-    //                 onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))' >
-    //                 Wedstrijd Ruilen
-    //             </button>
-    //         `;
-    // }
-    if (showRuilButton == true) {
-    const deadlineIsNull = match.deadline === null || match.deadline === "null";
-
-    if (deadlineIsNull) {
-
-        if (!matchUsers.some(u => u.user_id == userId)) {
-            console.log("User is not in match, show signup button");
+        if (isAdmin) {
+            stringThing += ` <a href="/matches/${match.id}/registrations" class="btn btn-primary mt-3" target="_blank">
+                Bekijk deelnemers
+            </a>`;
             stringThing += `
+<button class="btn btn-outline-primary btn-sm w-100 mt-2"
+    onclick='openEditMatchModal(${JSON.stringify(match)})'>
+    Bewerken
+</button>
+`;
+            if (deadlineIsNull) {
+                stringThing += `
+    <button class="btn btn-outline-dark btn-sm w-100 mt-2 set-deadline-btn"
+        data-match-id="${match.id}">
+        Aanmelding sluiten
+    </button>
+        `;
+            } else {
+                stringThing += `
+<button class="btn btn-outline-dark btn-sm w-100 mt-2 remove-deadline-btn"
+    data-match-id="${match.id}">
+    Aanmelding openen
+</button>
+        `;
+            }
+
+        }
+    if (showRuilButton == true) {
+
+        if (deadlineIsNull) {
+
+            if (!matchUsers.some(u => u.user_id == userId)) {
+                console.log("User is not in match, show signup button");
+                stringThing += `
         <button class="btn btn-outline-success btn-sm w-100 mt-2"
             onclick="confirmSignup(${match.id})">
             Aanmelden
         </button>
     `;
-        } else {
-            // console.log("Is admin?", isAdmin);
-            console.log("Deadline is null?", deadlineIsNull);
+            } else {
+                // console.log("Is admin?", isAdmin);
+                console.log("Deadline is null?", deadlineIsNull);
 
-            const matchData = encodeURIComponent(JSON.stringify(match));
+                const matchData = encodeURIComponent(JSON.stringify(match));
 
-            stringThing += `
+                stringThing += `
         <button
             class="btn btn-outline-warning btn-sm w-100 mt-2"
             data-bs-toggle="modal"
@@ -496,131 +448,20 @@ function openMatchModal(match, showRuilButton) {
             Afmelden
         </button>
     `;
-        }
-    } else {
-        stringThing += `
+            }
+        } else {
+            stringThing += `
         <p class="text-danger fw-bold fs-5 w-100 mt-2">
             Aanmelding is GESLOTEN!
         </p>        `
-    }
-    const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
-
-    if (isAdmin) {
-        stringThing += `
-<button class="btn btn-outline-primary btn-sm w-100 mt-2"
-    onclick='openEditMatchModal(${JSON.stringify(match)})'>
-    Bewerken
-</button>
-`;
-        if (deadlineIsNull) {
-            stringThing += `
-    <button class="btn btn-outline-dark btn-sm w-100 mt-2 set-deadline-btn"
-        data-match-id="${match.id}">
-        Aanmelding sluiten
-    </button>
-        `;
-        } else {
-            stringThing += `
-<button class="btn btn-outline-dark btn-sm w-100 mt-2 remove-deadline-btn"
-    data-match-id="${match.id}">
-    Aanmelding openen
-</button>
-        `;
         }
-
-    }
+        
     }
     body.innerHTML = stringThing;
 
 }
 
-// document.getElementById('confirm-deadline-btn').addEventListener('click', function () {
-//     if (!pendingDeadlineMatchId) return;
 
-//     fetch(`/admin/match/${pendingDeadlineMatchId}/set-deadline-now`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken
-//         },
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         bootstrap.Modal.getInstance(document.getElementById('confirmDeadlineModal')).hide();
-//         location.reload();
-//     })
-//     .catch(err => {
-//         console.error("Fout bij deadline zetten:", err);
-//         alert("Fout bij deadline zetten.");
-//     });
-// });
-
-// document.getElementById('confirm-remove-deadline-btn').addEventListener('click', function () {
-//     if (!pendingDeadlineMatchId) return;
-
-//     fetch(`/admin/match/${pendingDeadlineMatchId}/remove-deadline`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken
-//         },
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         bootstrap.Modal.getInstance(document.getElementById('removeDeadlineModal')).hide();
-//         location.reload();
-//     })
-//     .catch(err => {
-//         console.error("Fout bij deadline verwijderen:", err);
-//         alert("Fout bij deadline verwijderen.");
-//     });
-// });
-
-
-// function setDeadlineNow(matchId) {
-//     if (!confirm("Weet je zeker dat je de deadline nu wilt zetten?")) return;
-//     console.log("Verstuur verzoek naar:", `/admin/match/${matchId}/set-deadline-now`);
-//     console.log("CSRF Token:", csrfToken);
-
-//     fetch(`/admin/match/${matchId}/set-deadline-now`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken
-//         },
-//     })
-//         .then(async res => {
-//             console.log("HTTP status:", res.status);
-//             const text = await res.text();
-//             console.log("Antwoord tekst:", text);
-//             return JSON.parse(text);
-//         })
-//         .catch(err => {
-//             console.error("Fout bij fetch:", err);
-//         });
-// }
-// function removeDeadline(matchId) {
-//     if (!confirm("Weet je zeker dat je de deadline nu wilt zetten?")) return;
-//     console.log("Verstuur verzoek naar:", `/admin/match/${matchId}/remove-deadline`);
-//     console.log("CSRF Token:", csrfToken);
-
-//     fetch(`/admin/match/${matchId}/remove-deadline`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken
-//         },
-//     })
-//         .then(async res => {
-//             console.log("HTTP status:", res.status);
-//             const text = await res.text();
-//             console.log("Antwoord tekst:", text);
-//             return JSON.parse(text);
-//         })
-//         .catch(err => {
-//             console.error("Fout bij fetch:", err);
-//         });
-// }
 let pendingDeadlineMatchId = null;
 document.addEventListener('click', function (e) {
     if (e.target.matches('.set-deadline-btn')) {
