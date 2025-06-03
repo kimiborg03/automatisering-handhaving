@@ -12,7 +12,9 @@
             <ul class="profile-menu">
         @if(Auth::check())
             <li><a href="{{ url('/account') }}">Account</a></li>
-            <li><a href="{{ url('/admin') }}">Admin</a></li>
+                @if(Auth::user()->role === 'admin')
+                    <li><a href="{{ url('/admin') }}">Admin</a></li>
+                @endif
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
