@@ -214,22 +214,7 @@
                         <label for="edit-kickoff" class="form-label">Aftrap</label>
                         <input type="time" class="form-control" name="kick-off-time" id="edit-kickoff" required>
                     </div>
-                    {{-- field for selecting groups --}}
-                    <div id="edit-groups-container" class="form-check-group mb-3">
-                        @foreach ($groups as $group)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="groups[]" value="{{ $group->id }}"
-                                    id="edit-group{{ $group->id }}">
-                                <label class="form-check-label d-flex justify-content-between w-100"
-                                    for="edit-group{{ $group->id }}">
-                                    <span>{{ $group->name }}</span>
-                                    <span class="badge bg-secondary">
-                                        <i class="bi bi-people-fill me-1"></i>{{ $group->users_count }}
-                                    </span>
-                                </label>
-                            </div>
-                        @endforeach
-                    </div>
+                   
                     <div class="mb-3">
                         <label for="edit-category" class="form-label">Categorie</label>
                         <select class="form-select" name="category" id="edit-category" required>

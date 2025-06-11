@@ -172,8 +172,6 @@ class MatchController extends Controller
             'category' => 'required|string',
             'Limit' => 'nullable|integer|min:1',
             'comment' => 'nullable|string|max:1000',
-            'groups' => 'nullable|array',
-            'groups.*' => 'integer|exists:groups,id',
         ]);
 
         $match = Matches::findOrFail($id);
@@ -181,21 +179,7 @@ class MatchController extends Controller
 
         $checkin = $request->input('date') . ' ' . $request->input('check-in-time');
         $kickoff = $request->input('date') . ' ' . $request->input('kick-off-time');
-        $groupIds = $request->input('groups');
-        logger()->info('Group IDs:', ['group_ids' => $groupIds]);
 
-        $users = collect();
-        if (is_array($groupIds) && count($groupIds) > 0) {
-            $users = User::whereIn('group_id', $groupIds)->get()->map(function ($user) {
-                return [
-                    'user_id' => $user->id,
-                    'presence' => false,
-                ];
-            });
-        }
-        logger()->info('Users for match:', $users->toArray());
-
-        $match->users = json_encode($users->values());
         $match->name = $request->input('name-match');
         $match->location = $request->input('location');
         $match->checkin_time = $checkin;

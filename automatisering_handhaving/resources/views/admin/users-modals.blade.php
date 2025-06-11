@@ -33,7 +33,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-2" @if(auth()->user()->id === $user->id) style="display:none;" @endif>
                         <label class="form-label">Rol</label>
                         <select class="form-select" name="role" required>
                             <option value="admin" @if($user->role == 'admin') selected @endif>admin</option>
