@@ -14,8 +14,9 @@ class CategoryController extends Controller
 {
     public function show($category)
     {
-        $userId = Auth::id();
+        Log::info('Category is ' . $category);
 
+        $userId = Auth::id();
         if ($category === null) {
             $groups = Groups::withCount('users')->get();
             $matches = MatchService::getMatchesForUser($userId);
@@ -27,14 +28,28 @@ class CategoryController extends Controller
                 'playedMatches' => $matches['playedMatches'],
                 'availableMatches' => $matches['availableMatches'],
             ]);
+        } elseif ($category === 'all' && Auth::user() && Auth::user()->role === 'admin') {
+            // Admin: Load ALL matches, not just those available to the user
+            $groups = Groups::withCount('users')->get();
+            $allMatches = Matches::all();
+            $availableMatches = Matches::all(); // Show all matches as available for admin
+            Log::info('Admin viewing all matches:', $allMatches->toArray());
+            return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
         } else {
             $matchData = MatchService::getMatchesForUser($userId);
             $groups = Groups::withCount('users')->get();
-            $availableMatches = collect($matchData['availableMatches'])->where('category', $category)->values();
+            // Ensure the filter matches the actual structure of availableMatches
+            $availableMatches = collect($matchData['availableMatches'])->filter(function ($match) use ($category) {
+                // Adjust 'category' to the correct property if needed
+                return isset($match['category']) && $match['category'] == $category;
+            })->values();
             $allMatches = Matches::where('category', $category)->get();
             return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
         }
     }
+
+    // Define a constant for matches per batch to make it easy to change
+    const MATCHES_PER_BATCH = 6;
 
     public function loadMatches(Request $request)
     {
@@ -53,28 +68,37 @@ class CategoryController extends Controller
             ]);
 
             DB::enableQueryLog();
-            Log::info('Category is null, filtering for user_id: ' . $userId);
-            $matchesQuery = Matches::where('checkin_time', '>=', now());
 
-            if ($category !== null && $category !== '') {
-                $matchesQuery->where('category', $category);
-                $matches = $matchesQuery
-                    ->orderBy('checkin_time', 'asc')
+            if ($category === 'all') {
+                // Admin: Load ALL matches ever
+                $matches = Matches::orderBy('checkin_time', 'asc')
                     ->offset($offset)
-                    ->limit(12)
+                    ->limit(self::MATCHES_PER_BATCH)
                     ->get();
             } else {
-                // Haal alle toekomstige wedstrijden op en filter lokaal op user_id in JSON
-                $matches = $matchesQuery
-                    ->orderBy('checkin_time', 'asc')
-                    ->get()
-                    ->filter(function ($match) use ($userId) {
-                        $users = is_string($match->users) ? json_decode($match->users, true) : $match->users;
-                        return collect($users)->pluck('user_id')->contains($userId);
-                    })
-                    ->values()
-                    ->slice($offset, 12); // paginate lokaal
+                $matchesQuery = Matches::where('checkin_time', '>=', now());
+
+                if ($category !== null && $category !== '') {
+                    $matchesQuery->where('category', $category);
+                    $matches = $matchesQuery
+                        ->orderBy('checkin_time', 'asc')
+                        ->offset($offset)
+                        ->limit(self::MATCHES_PER_BATCH)
+                        ->get();
+                } else {
+                    // Haal alle toekomstige wedstrijden op en filter lokaal op user_id in JSON
+                    $matches = $matchesQuery
+                        ->orderBy('checkin_time', 'asc')
+                        ->get()
+                        ->filter(function ($match) use ($userId) {
+                            $users = is_string($match->users) ? json_decode($match->users, true) : $match->users;
+                            return collect($users)->pluck('user_id')->contains($userId);
+                        })
+                        ->values()
+                        ->slice($offset, self::MATCHES_PER_BATCH); // paginate lokaal
+                }
             }
+
             Log::info(DB::getQueryLog());
 
             return response()->json($matches);

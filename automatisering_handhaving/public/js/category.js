@@ -129,10 +129,162 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     // console.log(csrfToken);  // Dit print het CSRF-token in de console
+    // --- Date Range Filter System ---
+    let dateFrom = '';
+    let dateTo = '';
 
+    const dateFromInput = document.getElementById('filter-date-from');
+    const dateToInput = document.getElementById('filter-date-to');
 
+    // Show inputs if present
+    if (dateFromInput) {
+        dateFromInput.classList.remove('d-none');
+        if (dateFromInput.parentElement) dateFromInput.parentElement.classList.remove('d-none');
+        dateFromInput.style.display = '';
+        if (dateFromInput.parentElement) dateFromInput.parentElement.style.display = '';
+        dateFromInput.addEventListener('change', function () {
+            dateFrom = dateFromInput.value;
+            performDateRangeFilter(dateFrom, dateTo);
+        });
+    } else {
+        console.warn('Date from input with id "filter-date-from" not found in DOM.');
+    }
 
+    if (dateToInput) {
+        dateToInput.classList.remove('d-none');
+        if (dateToInput.parentElement) dateToInput.parentElement.classList.remove('d-none');
+        dateToInput.style.display = '';
+        if (dateToInput.parentElement) dateToInput.parentElement.style.display = '';
+        dateToInput.addEventListener('change', function () {
+            dateTo = dateToInput.value;
+            performDateRangeFilter(dateFrom, dateTo);
+        });
+    } else {
+        console.warn('Date to input with id "filter-date-to" not found in DOM.');
+    }
 
+    function performDateRangeFilter(fromStr, toStr) {
+        if (!fromStr && !toStr) {
+            // No filter, reset to normal search or all
+            if (searchQuery.trim() !== '') {
+                performSearch(searchQuery);
+            } else {
+                isSearching = false;
+                offset = 0;
+                container.innerHTML = '';
+                noMoreText.classList.add('d-none');
+                loadMoreBtn.classList.remove('d-none');
+                loadMatches();
+            }
+            return;
+        }
+        isSearching = true;
+        // Filter matches by date range (YYYY-MM-DD) and sort by date ascending
+        const filtered = allMatches
+            .filter(match => {
+                const matchDate = new Date(match.checkin_time).toISOString().split('T')[0];
+                let afterFrom = true, beforeTo = true;
+                if (fromStr) afterFrom = matchDate >= fromStr;
+                if (toStr) beforeTo = matchDate <= toStr;
+                return afterFrom && beforeTo;
+            })
+            .sort((a, b) => new Date(a.checkin_time) - new Date(b.checkin_time));
+        renderMatches(filtered);
+        loadMoreBtn.classList.add('d-none');
+    }
+
+        // --- Full Search System ---
+        let searchQuery = '';
+        let isSearching = false;
+
+        const searchInput = document.getElementById('search-matches');
+        const searchClearBtn = document.getElementById('clear-search-btn');
+
+        function renderMatches(matches) {
+            container.innerHTML = '';
+            if (matches.length === 0) {
+                noMoreText.classList.remove('d-none');
+                loadMoreBtn.classList.add('d-none');
+                return;
+            }
+            matches.forEach(match => {
+                const col = document.createElement('div');
+                col.className = 'col';
+                col.innerHTML = `
+                    <div class="card h-100 shadow-sm p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">${match.name}</h5>
+                            <p class="card-text mb-1"><strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}</p>
+                            <p class="card-text mb-1"><strong>Locatie:</strong> ${match.location}</p>
+                            <p class="card-text mb-1"><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
+                            <p class="card-text mb-2"><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
+                            <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
+                                data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
+                                Meer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            noMoreText.classList.add('d-none');
+        }
+
+        function performSearch(query) {
+            const q = query.trim().toLowerCase();
+            if (q === '') {
+            isSearching = false;
+            offset = 0;
+            container.innerHTML = '';
+            noMoreText.classList.add('d-none');
+            loadMoreBtn.classList.remove('d-none');
+            loadMatches();
+            return;
+            }
+            isSearching = true;
+            // Filter and sort by date (earliest first)
+            const filtered = allMatches
+            .filter(match =>
+                match.name.toLowerCase().includes(q) ||
+                (match.location && match.location.toLowerCase().includes(q))
+            )
+            .sort((a, b) => new Date(a.checkin_time) - new Date(b.checkin_time));
+            renderMatches(filtered);
+            loadMoreBtn.classList.add('d-none');
+        }
+
+        // --- Ensure search bar is visible ---
+        if (searchInput) {
+            searchInput.classList.remove('d-none');
+            searchInput.parentElement?.classList.remove('d-none');
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                searchQuery = searchInput.value;
+                performSearch(searchQuery);
+                if (searchClearBtn) {
+                    searchClearBtn.classList.toggle('d-none', searchInput.value.trim() === '');
+                }
+            });
+        }
+
+        if (searchClearBtn) {
+            searchClearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                searchQuery = '';
+                isSearching = false;
+                performSearch('');
+                searchClearBtn.classList.add('d-none');
+            });
+        }
+
+        // Patch loadMoreBtn to not load more when searching
+        const origLoadMatches = loadMatches;
+        loadMatches = function () {
+            if (isSearching) return;
+            origLoadMatches();
+        };
 
 
 

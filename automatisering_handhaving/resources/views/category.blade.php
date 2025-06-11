@@ -22,13 +22,34 @@
 @section('title', 'Wedstrijden - ' . $category)
 
 @section('content')
-        <div class="container mt-4 bg-light rounded p-4">
-            <meta name="category" content="{{ $category }}">
-            <h2 class="mb-4 text-center fw-bold">Wedstrijden voor {{ $category }}</h2>
-
-            <div id="matches-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                <!-- matches appear here -->
+    <div class="container mt-4 bg-light rounded p-4">
+        <meta name="category" content="{{ $category }}">
+        @if ($category === 'all')
+            <!-- Date Range Filter -->
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <label for="filter-date-from" class="form-label mb-0">Van:</label>
+                    <input type="date" id="filter-date-from" class="form-control d-none" />
+                </div>
+                <div class="col-auto">
+                    <label for="filter-date-to" class="form-label mb-0">Tot:</label>
+                    <input type="date" id="filter-date-to" class="form-control d-none" />
+                </div>
             </div>
-            @include('partials.match-modals', ['userId' => auth()->user()->id, 'allMatches' => $allMatches])
-    
+            <div class="container mt-4 bg-light rounded p-4">
+                {{--
+                <meta name="category" content="{{ $category }}"> --}}
+                <div class="input-group mb-3">
+                    <input type="text" id="search-matches" class="form-control d-none" placeholder="Zoek wedstrijden...">
+                    <button id="clear-search-btn" class="btn btn-outline-secondary d-none" type="button">X</button>
+                </div>
+            </div>
+        @endif
+        <h2 class="mb-4 text-center fw-bold">Wedstrijden voor {{ $category }}</h2>
+
+        <div id="matches-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            <!-- matches appear here -->
+        </div>
+        @include('partials.match-modals', ['userId' => auth()->user()->id, 'allMatches' => $allMatches])
+
 @endsection

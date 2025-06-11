@@ -32,8 +32,12 @@ class MatchService
             $matchDate = Carbon::parse($match->kickoff_time);
             $users = json_decode($match->users, true);
 
-            $wasPresent = collect($users)->contains(fn($user) => $user['user_id'] === $userId && $user['presence'] === true);
-            \Illuminate\Support\Facades\Log::debug('Evaluating match for played/upcoming', [
+            // Ensure presence is strictly boolean true and user_id is cast to int
+            $wasPresent = collect($users)->contains(function ($user) use ($userId) {
+                return (int)$user['user_id'] === (int)$userId &&
+                    filter_var($user['presence'], FILTER_VALIDATE_BOOLEAN) === true;
+            });
+            Log::debug('Evaluating match for played/upcoming', [
                 'match_id' => $match->id,
                 'kickoff_time' => $match->kickoff_time,
                 'isPast' => $matchDate->isPast(),
@@ -43,7 +47,7 @@ class MatchService
 
             if ($matchDate->isPast() && $wasPresent) {
                 $playedMatches[] = $match;
-                \Illuminate\Support\Facades\Log::debug('Added to playedMatches', ['match_id' => $match->id]);
+                Log::debug('Added to playedMatches', ['match_id' => $match->id]);
                 return false;
             }
 
