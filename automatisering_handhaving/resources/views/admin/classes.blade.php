@@ -9,6 +9,7 @@
 @section('content')
     <div class="class-card">
         <h2 class="text-center">Klassenbeheer</h2>
+        
         {{-- add class button --}}
         <div class="text-end mb-3">
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">
@@ -50,6 +51,10 @@
                 </div>
             @endforeach
         </div>
+        {{-- back to admin panel button --}}
+        <a href="{{ url('/admin') }}" class="btn btn-secondary back-button">
+        <i class="bi bi-arrow-return-left"></i> Terug naar Admin paneel
+        </a>
     </div>
 {{-- include modals for adding and editing popups --}}
 @include('admin.classes-modals')
