@@ -32,7 +32,24 @@
     margin-top: 0.5rem;
     color: #7f7;
 }
-
+.info-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.info-label {
+    font-weight: 600;
+    color: #0d6efd;
+    margin-right: 4px;
+}
+.info-value {
+    font-weight: 500;
+    color: #212529;
+}
 
 .scoreboard-section {
     flex: 1;

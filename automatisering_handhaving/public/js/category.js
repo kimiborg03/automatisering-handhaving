@@ -86,32 +86,36 @@ document.addEventListener('DOMContentLoaded', function () {
                     const col = document.createElement('div');
                     col.className = 'col';
                   col.innerHTML = `
-                    <div class="card h-100 shadow-sm p-2">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3 fw-bold text-primary">${match.name}</h5>
-                            <p class="card-text mb-1 text-primary">
-                                <i class="bi bi-calendar-event me-1 text-primary fs-4 align-middle"></i>
-                                <strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}
-                            </p>
-                            <p class="card-text mb-1 text-primary">
-                                <i class="bi bi-geo-alt me-1 text-success fs-4 align-middle"></i>
-                                <strong>Locatie:</strong> ${match.location}
-                            </p>
-                            <p class="card-text mb-1 text-primary">
-                                <i class="bi bi-door-open me-1 text-warning fs-4 align-middle"></i>
-                                <strong>Check-in:</strong> ${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                            <p class="card-text mb-2 text-primary">
-                                <i class="bi bi-play-fill me-1 text-danger fs-4 align-middle"></i>
-                                <strong>Aftrap:</strong> ${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                            <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
-                                data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
-                                Meer
-                            </button>
-                        </div>
-                    </div>
-                `;
+    <div class="card h-100 shadow-sm p-2">
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-3 fw-bold text-primary">${match.name}</h5>
+            <div class="info-box mb-2">
+                <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
+                <span class="info-label">Datum</span>
+                <div class="info-value">${new Date(match.checkin_time).toLocaleDateString()}</div>
+            </div>
+            <div class="info-box mb-2">
+                <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
+                <span class="info-label">Locatie</span>
+                <div class="info-value">${match.location}</div>
+            </div>
+            <div class="info-box mb-2">
+                <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
+                <span class="info-label">Check-in</span>
+                <div class="info-value">${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+            <div class="info-box mb-2">
+                <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
+                <span class="info-label">Aftrap</span>
+                <div class="info-value">${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+            <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal"
+                data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
+                Meer
+            </button>
+        </div>
+    </div>
+`;
                     container.appendChild(col);
                 });
 
