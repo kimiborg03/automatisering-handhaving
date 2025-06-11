@@ -69,13 +69,29 @@
             @forelse ($playedMatches as $match)
                 <div class="col">
                     <div class="card h-100 shadow-sm p-2">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $match->name }}</h5>
-                            <p class="card-text mb-1"><strong>Datum:</strong> {{ $match->checkin_time->format('Y-m-d') }}</p>
-                            <p class="card-text mb-1"><strong>Locatie:</strong> {{ $match->location }}</p>
-                            <p class="card-text mb-1"><strong>Check-in:</strong> {{ $match->checkin_time->format('H:i') }}</p>
-                            <p class="card-text mb-2"><strong>Aftrap:</strong> {{ $match->kickoff_time->format('H:i') }}</p>
-                            <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-3 fw-bold text-primary">{{ $match->name }}</h5>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
+                                <span class="info-label">Datum</span>
+                                <div class="info-value">{{ $match->checkin_time->format('Y-m-d') }}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
+                                <span class="info-label">Locatie</span>
+                                <div class="info-value">{{ $match->location }}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
+                                <span class="info-label">Check-in</span>
+                                <div class="info-value">{{ $match->checkin_time->format('H:i') }}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
+                                <span class="info-label">Aftrap</span>
+                                <div class="info-value">{{ $match->kickoff_time->format('H:i') }}</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal"
                                 data-bs-target="#matchModal" onclick='openMatchModal(@json($match))'>
                                 Meer
                             </button>
