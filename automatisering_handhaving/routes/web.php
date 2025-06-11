@@ -12,6 +12,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\AccountController;
 use App\Mail\RegisterMail;
 use App\Http\Controllers\PasswordSetupController;
@@ -22,6 +23,17 @@ Route::get('/login', function () {
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// route for forgotten password
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// form to request a password reset link
+Route::get('password/reset/{token}', function ($token) {
+    return view('reset', ['token' => $token]);
+})->name('password.reset');
+
+// route to reset the password
+Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name('password.update');
 
 // routes for logged in users
 Route::middleware('auth')->group(function () {
