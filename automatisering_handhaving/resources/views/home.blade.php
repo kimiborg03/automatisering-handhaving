@@ -8,19 +8,6 @@
 
 @push('scripts')
     <script src="{{ asset('js/category.js') }}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleButton = document.getElementById('toggleGridView');
-            const matchesContainer = document.getElementById('matches-container');
-
-            if (toggleButton && matchesContainer) {
-                toggleButton.addEventListener('click', function () {
-                    matchesContainer.classList.toggle('row-cols-1');
-                    matchesContainer.classList.toggle('row-cols-2');
-                });
-            }
-        });
-    </script>
 @endpush
 
 <meta name="csrf-token" content="{{ csrf_token() }}">

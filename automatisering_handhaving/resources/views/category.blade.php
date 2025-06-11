@@ -26,6 +26,12 @@
             <meta name="category" content="{{ $category }}">
             <h2 class="mb-4 text-center fw-bold">Wedstrijden voor {{ $category }}</h2>
 
+            <!-- Mobile grid toggle button -->
+            <div class="d-sm-none mb-3 text-end">
+                <button class="btn btn-outline-secondary" id="toggleGridView" title="Toon als grid">
+                    <i class="bi bi-grid"></i>
+                </button>
+            </div>
             <div id="matches-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                 <!-- matches appear here -->
             </div>
