@@ -51,6 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/password/setup/{token}', [RegisterController::class, 'showPasswordSetupForm'])->name('password.setup.form')->middleware('signed');
     // save password route
     Route::post('/password/setup', [PasswordSetupController::class, 'setPassword'])->name('password.setup.submit');
+
+    // route for changing password
+    Route::post('/account/change-password', [\App\Http\Controllers\PasswordSetupController::class, 'changePassword'])->name('password.change');
 });
 
 // Admin-only routes

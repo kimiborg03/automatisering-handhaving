@@ -29,6 +29,15 @@
                 {{ $group ? $group->name : '-' }}
             </p>
         </div>
+        <div class="text-center mt-4">
+            {{-- button to form for changing password --}}
+            <button class="btn btn-primary" onclick="document.getElementById('passwordModal').style.display='block'">
+                Wachtwoord veranderen
+            </button>
+        </div>
     </div>
 </div>
+
+{{-- Include the password change modal --}}
+@include('partials.password_modal')
 @endsection
