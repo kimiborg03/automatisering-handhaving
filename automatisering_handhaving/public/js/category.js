@@ -719,11 +719,14 @@ function openSwapModal(currentMatch) {
             const matchData = encodeURIComponent(JSON.stringify(match));
             body.innerHTML += `
                 <div class="card mb-2">
-                    <div class="card-body p-2">
-                        <strong>${match.name}</strong><br>
-                        Locatie: ${match.location}<br>
-                        Tijd: ${new Date(match.kickoff_time).toLocaleTimeString()}
-                        <button class="btn btn-sm btn-outline-success mt-2"
+                    <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                        <div>
+                            <strong>${match.name}</strong><br>
+                            Locatie: ${match.location}<br>
+                            Tijd: ${new Date(match.kickoff_time).toLocaleTimeString()}
+                        </div>
+                        <button class="btn btn-outline-success btn-lg ms-3 px-4 py-2"
+                            style="white-space:nowrap;"
                             data-bs-toggle="modal"
                             data-bs-target="#thirdModal"
                             onclick='prepareConfirm(JSON.parse(decodeURIComponent("${matchData}")))' >

@@ -75,6 +75,10 @@
         background-color: #f4f4f4;
     }
 
+        .dropdown-menu li p:hover {
+        background-color: #000000;
+    }
+
      /* Profile dropdown menu */
      .profile-dropdown {
         position: relative;
