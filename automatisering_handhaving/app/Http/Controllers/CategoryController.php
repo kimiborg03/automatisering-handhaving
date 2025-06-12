@@ -26,30 +26,32 @@ class CategoryController extends Controller
                 'groups' => $groups,
                 'allMatches' => $matches['upcomingMatches'],
                 'playedMatches' => $matches['playedMatches'],
-                'availableMatches' => $matches['availableMatches'],
+                'availableMatches' => $this->getUpcomingUserMatches($userId),
             ]);
         } elseif ($category === 'all' && Auth::user() && Auth::user()->role === 'admin') {
             // Admin: Load ALL matches, not just those available to the user
             $groups = Groups::withCount('users')->get();
+            $matchData = MatchService::getMatchesForUser($userId);
             $allMatches = Matches::all();
+            $upcomingMatches = $matchData['upcomingMatches'];
+            $playedMatches = $matchData['playedMatches'];
             $availableMatches = Matches::all(); // Show all matches as available for admin
-            $playedMatches = Matches::all(); // For admin, all matches can be considered played
             Log::info('Admin viewing all matches:', $allMatches->toArray());
             return view('category', [
             'allMatches' => $allMatches,
             'category' => $category,
-            'availableMatches' => $availableMatches,
-            'playedMatches' => $playedMatches,
+                'upcomingMatches' => $upcomingMatches,
+                'playedMatches' => $playedMatches,
+                'availableMatches' => $availableMatches,
             'groups' => $groups,
             ]);
         } else {
             $matchData = MatchService::getMatchesForUser($userId);
             $groups = Groups::withCount('users')->get();
-            // Ensure the filter matches the actual structure of availableMatches
-            $availableMatches = collect($matchData['availableMatches'])->filter(function ($match) use ($category) {
-            // Adjust 'category' to the correct property if needed
+            $upcomingMatches = collect($matchData['upcomingMatches'])->filter(function ($match) use ($category) {
             return isset($match['category']) && $match['category'] == $category;
             })->values();
+            $availableMatches = collect($matchData['availableMatches'])->where('category', $category)->values();
             $allMatches = Matches::where('category', $category)->get();
             $playedMatches = collect($matchData['playedMatches'])->filter(function ($match) use ($category) {
             return isset($match['category']) && $match['category'] == $category;
@@ -57,11 +59,27 @@ class CategoryController extends Controller
             return view('category', [
             'allMatches' => $allMatches,
             'category' => $category,
+                'upcomingMatches' => $upcomingMatches,
             'availableMatches' => $availableMatches,
             'playedMatches' => $playedMatches,
             'groups' => $groups,
             ]);
         }
+    }
+
+    public function getUpcomingUserMatches($userId)
+    {
+        // Haal alle toekomstige wedstrijden op en filter lokaal op user_id in JSON
+        $matches = Matches::where('checkin_time', '>=', now())
+            ->orderBy('checkin_time', 'asc')
+            ->get()
+            ->filter(function ($match) use ($userId) {
+                $users = is_string($match->users) ? json_decode($match->users, true) : $match->users;
+                return collect($users)->pluck('user_id')->contains($userId);
+            })
+            ->values();
+        Log::info('Upcoming user matches:', $matches->toArray());
+        return $matches;
     }
 
     // Define a constant for matches per batch to make it easy to change

@@ -5,6 +5,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 @endpush
+<meta name="played-matches" content="{{ count($playedMatches) }}">
+<meta name="upcoming-matches" content="{{ count($allMatches) }}">
 
 @push('scripts')
     <script src="{{ asset('js/category.js') }}"></script>
@@ -14,8 +16,7 @@
 <meta name="category" content="null">
 <meta name="is-admin" content="{{ auth()->user()->role == 'admin' ? 'true' : 'false' }}">
 <meta name="user-id" content="{{ auth()->user()->id }}">
-<meta name="played-matches" content="{{ count($playedMatches) }}">
-<meta name="available-matches" content="{{ count($availableMatches) }}">
+
 
 <script id="availableMatches" type="application/json">
     {!! json_encode($availableMatches) !!}

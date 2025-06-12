@@ -226,15 +226,34 @@ document.addEventListener('DOMContentLoaded', function () {
             matches.forEach(match => {
                 const col = document.createElement('div');
                 col.className = 'col';
+                // Calculate numberOfUsers for each match
+                let matchUsers = Array.isArray(match.users) ? match.users : (match.users ? JSON.parse(match.users) : []);
+                let numberOfUsers = matchUsers.length;
                 col.innerHTML = `
-                    <div class="card h-100 shadow-sm p-2">
-                        <div class="card-body">
-                            <h5 class="card-title">${match.name}</h5>
-                            <p class="card-text mb-1"><strong>Datum:</strong> ${new Date(match.checkin_time).toLocaleDateString()}</p>
-                            <p class="card-text mb-1"><strong>Locatie:</strong> ${match.location}</p>
-                            <p class="card-text mb-1"><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
-                            <p class="card-text mb-2"><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
-                            <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
+                                    <div class="card h-100 shadow-sm p-2">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-3 fw-bold text-primary">${match.name}</h5>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
+                                <span class="info-label">Datum</span>
+                                <div class="info-value">${new Date(match.checkin_time).toLocaleDateString()}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
+                                <span class="info-label">Locatie</span>
+                                <div class="info-value">${match.location}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
+                                <span class="info-label">Check-in</span>
+                                <div class="info-value">${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            </div>
+                            <div class="info-box mb-2">
+                                <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
+                                <span class="info-label">Aftrap</span>
+                                <div class="info-value">${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal"
                                 data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
                                 Meer
                             </button>
@@ -522,8 +541,10 @@ function openMatchModal(match, showRuilButton) {
         cb.checked = false;
     });
     const playedMatches = parseInt(document.querySelector('meta[name="played-matches"]')?.content || '0');
-    const availableMatches = parseInt(document.querySelector('meta[name="available-matches"]')?.content || '0');
-    const totalMatches = playedMatches + availableMatches;
+    const upcomingMatches = parseInt(document.querySelector('meta[name="upcoming-matches"]')?.content || '0');
+    const totalMatches = playedMatches + upcomingMatches;
+    console.log("Total matches:", totalMatches); // Add this to debug
+    console.log(upcomingMatches, playedMatches);
     // Zet de juiste vinkjes aan
     if (Array.isArray(match.groups)) {
         match.groups.forEach(groupId => {

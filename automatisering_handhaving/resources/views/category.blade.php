@@ -9,7 +9,8 @@
 @endpush
 <meta name="category" content="{{ $category }}">
 <meta name="is-admin" content="{{ auth()->user()->role == 'admin' ? 'true' : 'false' }}">
-
+<meta name="played-matches" content="{{ count($playedMatches) }}">
+<meta name="upcoming-matches" content="{{ count($upcomingMatches) }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="user-id" content="{{ auth()->user()->id }}">
 <script id="all-matches" type="application/json">
