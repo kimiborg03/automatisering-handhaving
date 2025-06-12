@@ -43,9 +43,13 @@
                 <li><a href="{{ route('category.show', 'Jong-AZ') }}">Jong-AZ</a></li>
                 <li><a href="{{ route('category.show', 'Overige') }}">Overige</a></li>
                 @if(Auth::check() && Auth::user()->role === 'admin')
-                    <li style="background-color: #605f5f;">
-                        <a href="{{ route('category.show', 'all') }}" style="color: #000000;">Alle Wedstrijden</a>
-                    </li>
+                <li style="margin: 8px 12px;">
+                    <p href="{{ route('category.show', 'all') }}"
+                    class="btn btn-dark w-100 alle-wedstrijden-btn"
+                    style="color: #fff; font-weight: 500; border-radius: 5px; font-size: 0.97rem; padding: 10px 0;">
+                        Alle Wedstrijden
+                </p>
+                </li>
                 @endif
             </ul>
         </li>

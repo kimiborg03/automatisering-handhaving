@@ -548,15 +548,43 @@ function openMatchModal(match, showRuilButton) {
     }
         const deadlineIsNull = match.deadline === null || match.deadline === "null";
 
-    let stringThing = `
-            <p><strong>Naam:</strong> ${match.name}</p>
-            <p><strong>Datum:</strong> ${formatDateOnly(match.checkin_time)}</p>
-            <p><strong>Locatie:</strong> ${match.location}</p>
-            <p><strong>Check-in:</strong> ${formatUtc(match.checkin_time)}</p>
-            <p><strong>Aftrap:</strong> ${formatUtc(match.kickoff_time)}</p>
-            <p><strong>Category:</strong> ${match.category}</p>
-            <p><strong>Ingeschreven:</strong> ${numberOfUsers} / ${match.limit}</p>
-        `;
+let stringThing = `
+    <div class="info-box mb-2">
+        <i class="bi bi-person-badge me-1 text-primary fs-5 align-middle"></i>
+        <span class="info-label">Naam</span>
+        <div class="info-value">${match.name}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
+        <span class="info-label">Datum</span>
+        <div class="info-value">${formatDateOnly(match.checkin_time)}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
+        <span class="info-label">Locatie</span>
+        <div class="info-value">${match.location}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
+        <span class="info-label">Check-in</span>
+        <div class="info-value">${formatUtc(match.checkin_time)}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
+        <span class="info-label">Aftrap</span>
+        <div class="info-value">${formatUtc(match.kickoff_time)}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-tags me-1 text-info fs-5 align-middle"></i>
+        <span class="info-label">Categorie</span>
+        <div class="info-value">${match.category}</div>
+    </div>
+    <div class="info-box mb-2">
+        <i class="bi bi-people-fill me-1 text-secondary fs-5 align-middle"></i>
+        <span class="info-label">Ingeschreven</span>
+        <div class="info-value">${numberOfUsers} / ${match.limit}</div>
+    </div>
+`;
   const isAdmin = document.querySelector('meta[name="is-admin"]')?.content === 'true';
 
         if (isAdmin) {
@@ -699,11 +727,14 @@ function openSwapModal(currentMatch) {
             const matchData = encodeURIComponent(JSON.stringify(match));
             body.innerHTML += `
                 <div class="card mb-2">
-                    <div class="card-body p-2">
-                        <strong>${match.name}</strong><br>
-                        Locatie: ${match.location}<br>
-                        Tijd: ${new Date(match.kickoff_time).toLocaleTimeString()}
-                        <button class="btn btn-sm btn-outline-success mt-2"
+                    <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                        <div>
+                            <strong>${match.name}</strong><br>
+                            Locatie: ${match.location}<br>
+                            Tijd: ${new Date(match.kickoff_time).toLocaleTimeString()}
+                        </div>
+                        <button class="btn btn-outline-success btn-lg ms-3 px-4 py-2"
+                            style="white-space:nowrap;"
                             data-bs-toggle="modal"
                             data-bs-target="#thirdModal"
                             onclick='prepareConfirm(JSON.parse(decodeURIComponent("${matchData}")))' >
