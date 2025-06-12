@@ -235,7 +235,7 @@
                         <textarea class="form-control" name="comment" id="edit-comment"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex gap-2 justify-content-end align-items-center">
                     <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </form>

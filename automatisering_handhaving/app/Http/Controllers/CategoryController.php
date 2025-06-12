@@ -33,18 +33,34 @@ class CategoryController extends Controller
             $groups = Groups::withCount('users')->get();
             $allMatches = Matches::all();
             $availableMatches = Matches::all(); // Show all matches as available for admin
+            $playedMatches = Matches::all(); // For admin, all matches can be considered played
             Log::info('Admin viewing all matches:', $allMatches->toArray());
-            return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
+            return view('category', [
+            'allMatches' => $allMatches,
+            'category' => $category,
+            'availableMatches' => $availableMatches,
+            'playedMatches' => $playedMatches,
+            'groups' => $groups,
+            ]);
         } else {
             $matchData = MatchService::getMatchesForUser($userId);
             $groups = Groups::withCount('users')->get();
             // Ensure the filter matches the actual structure of availableMatches
             $availableMatches = collect($matchData['availableMatches'])->filter(function ($match) use ($category) {
-                // Adjust 'category' to the correct property if needed
-                return isset($match['category']) && $match['category'] == $category;
+            // Adjust 'category' to the correct property if needed
+            return isset($match['category']) && $match['category'] == $category;
             })->values();
             $allMatches = Matches::where('category', $category)->get();
-            return view('category', compact('allMatches', 'category', 'availableMatches', 'groups'));
+            $playedMatches = collect($matchData['playedMatches'])->filter(function ($match) use ($category) {
+            return isset($match['category']) && $match['category'] == $category;
+            })->values();
+            return view('category', [
+            'allMatches' => $allMatches,
+            'category' => $category,
+            'availableMatches' => $availableMatches,
+            'playedMatches' => $playedMatches,
+            'groups' => $groups,
+            ]);
         }
     }
 

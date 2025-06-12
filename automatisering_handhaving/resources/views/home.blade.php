@@ -14,6 +14,8 @@
 <meta name="category" content="null">
 <meta name="is-admin" content="{{ auth()->user()->role == 'admin' ? 'true' : 'false' }}">
 <meta name="user-id" content="{{ auth()->user()->id }}">
+<meta name="played-matches" content="{{ count($playedMatches) }}">
+<meta name="available-matches" content="{{ count($availableMatches) }}">
 
 <script id="availableMatches" type="application/json">
     {!! json_encode($availableMatches) !!}

@@ -521,7 +521,9 @@ function openMatchModal(match, showRuilButton) {
     document.querySelectorAll('#edit-groups-container input[type="checkbox"]').forEach(cb => {
         cb.checked = false;
     });
-
+    const playedMatches = parseInt(document.querySelector('meta[name="played-matches"]')?.content || '0');
+    const availableMatches = parseInt(document.querySelector('meta[name="available-matches"]')?.content || '0');
+    const totalMatches = playedMatches + availableMatches;
     // Zet de juiste vinkjes aan
     if (Array.isArray(match.groups)) {
         match.groups.forEach(groupId => {
@@ -610,12 +612,18 @@ function openMatchModal(match, showRuilButton) {
             onclick='openSwapModal(JSON.parse(decodeURIComponent("${matchData}")))'>
             Wedstrijd Ruilen
         </button>
+    `
+                if (totalMatches >= 10) {
+                    stringThing += `
         <button
             class="btn btn-outline-danger btn-sm w-100 mt-2"
             onclick="confirmUnsubscribe(${match.id})">
             Afmelden
         </button>
     `;
+                }
+
+                ;
             }
         } else {
             stringThing += `
