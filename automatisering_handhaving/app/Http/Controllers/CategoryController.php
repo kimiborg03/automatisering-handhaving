@@ -49,7 +49,7 @@ class CategoryController extends Controller
     }
 
     // Define a constant for matches per batch to make it easy to change
-    const MATCHES_PER_BATCH = 6;
+    const MATCHES_PER_BATCH = 12;
 
     public function loadMatches(Request $request)
     {
