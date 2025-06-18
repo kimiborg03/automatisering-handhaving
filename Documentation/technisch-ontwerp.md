@@ -5,17 +5,15 @@
 | Versie        |   |
 |---------------|---|
 | Datum         |   |
-| Naam          |   |
-| Studentnummer |   |
+| Naam          |Kimi Borg   |Appie Khalid
+| Studentnummer |158205      |174663
 
 # Inhoud
 1. [Inleiding](#inleiding)
 2. [Functionaliteiten](#functionaliteiten)
-3. [Klassendiagram](#klassendiagram)
-4. [Datamodel](#datamodel)
-5. [ERD](#entiteit-relationship-diagram-erd)
-6. [Data-Dictionary](#datadictionary)
-7. [Oplevering](#oplevering)
+3. [ERD](#entiteit-relationship-diagram-erd)
+4. [Data-Dictionary](#datadictionary)
+5. [Oplevering](#oplevering)
 
 
 ## Inleiding
@@ -25,7 +23,7 @@
 -   Voor welk bedrijf wordt het programma gemaakt
 -   Waarom wordt het programma gemaakt
 -   Welke doelgroep gaat het programma gebruiken (klanten, medewerkers, Internetgebruikers, enzovoort)
--   Wat voor soort programma maak je (webapplicatie, desktopapplicatie, mobile app, enzovoort
+-   Wat voor soort programma maak je (webapplicatie, desktopapplicatie, mobile app, enzovoort)
 
 **Voorbeeld**
 
@@ -52,48 +50,64 @@ Er wordt een webapplicatie gemaakt die ook op een mobiel goed te gebruiken moet 
     -   Bij het verwijderen van de medewerker wordt ook de pas geblokkeerd
 
 
-
-## Klassendiagram
-
-*Hier beschrijf je hoe de klassen van je programma eruitzien en met elkaar samenhangen. Je kan dit doen met behulp van een diagram of door een beschrijving van de classes, de methods en eigenschappen.*
-
-**Voorbeeld**
-
-![](media/403bd536753639a02a425b458787ee21.png)
-
-
-# Datamodel
-
 ## Entiteit Relationship Diagram (ERD)
 
-
-
-*voeg hier een schema in van het datamodel. Maak voor elke tabel een blokje en geef met lijnen weer hoe de tabellen met elkaar verbonden zijn*
-
-**Voorbeeld**
-
-![](media/a52f9509fe92d6c9c4346ded67eed4cc.png)
-
-
+![](media/erd-automatiseringhandhaving.png)
 
 ## Datadictionary
 
-
-
 *Voeg hier een lijst in met per tabel een opsomming van de gebruikte kolommen. Per kolom geeft je weer: de naam, het datatype, de lengte, of het een sleutel is en zoja naar welke tabel.]*
 
-**Voorbeeld**
+| **users**     |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| username      | string       | 255*       |         |                  |
+| password      | string       | 255*       |         |                  |
+| email         | string       | 255*       |         |                  |
+| group_id      | unsignedBigInteger |      | Foreign | groups           |
+| role          | string       | 255*       |         |                  |
+| access        | boolean      |            |         |                  |
+| password_setup_token | string | 255*      |         |                  |
+| email_verified_at | timestamp |           |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
 
-| **medewerker** |              |            |         |                  |
-|----------------|--------------|------------|---------|------------------|
-| **Kolom**      | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
-| Id             | integer      |            | Primary |                  |
-| rol_id         | integer      |            | Foreign | Rollen           |
-| voornaam       | string       | 200        |         |                  |
-| achternaam     | string       | 200        |         |                  |
-| voorvoegsel    | string       | 20         |         |                  |
+
+| **matches**   |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| location      | string       | 255*       |         |                  |
+| checkin_time  | datetime     |            |         |                  |
+| kickoff_time  | datetime     |            |         |                  |
+| category      | string       | 255*       |         |                  |
+| comment       | text         |            |         |                  |
+| users         | json         |            |         |                  |
+| limit         | integer      |            |         |                  |
+| deadline      | string       | 255*       |         |                  |
+| groups        | json         |            |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
 
 
+| **groups**    |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
+
+
+| **password_reset_tokens**|              |            |         |                  |
+|--------------------------|--------------|------------|---------|------------------|
+| **Kolom**                | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| email                    | string       | 255*       | Index   |                  |
+| token                    | string       | 255*       |         |                  |
+| created_at               | timestamp    |            |         |                  |
 
 ## Oplevering
 
