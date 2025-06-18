@@ -66,3 +66,7 @@ Het medewerkersoverzicht is een lijst met medewerkers met de volgende informatie
 -   Beschikbare vakantiedagen/Opgenomen vakantiedagen
 
 ![Afbeelding met tabel Automatisch gegenereerde beschrijving](media/a045e6e332a3754cd751ef15ab3bc2dc.png)
+
+
+
+
