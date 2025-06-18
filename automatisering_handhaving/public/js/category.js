@@ -662,7 +662,7 @@ let stringThing = `
             Wedstrijd Ruilen
         </button>
     `
-                if (totalMatches >= 10) {
+                if (totalMatches >= 11) {
                     stringThing += `
         <button
             class="btn btn-outline-danger btn-sm w-100 mt-2"
