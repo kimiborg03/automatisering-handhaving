@@ -492,11 +492,11 @@ function openEditMatchModal(match) {
         };
         // Add the button to the modal footer or form
         const modalFooter = document.querySelector('#editMatchModal .modal-footer');
-        if (modalFooter) {
-            modalFooter.appendChild(deleteBtn);
-        } else {
-            form.appendChild(deleteBtn);
-        }
+        // if (modalFooter) {
+        //     modalFooter.appendChild(deleteBtn);
+        // } else {
+        //     form.appendChild(deleteBtn);
+        // }
     } else {
         // Update the onclick handler in case match.id changed
         deleteBtn.onclick = function () {
