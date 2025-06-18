@@ -113,7 +113,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
                 <button type="button" class="btn btn-success" id="confirm-signup-btn">Aanmelden</button>
-            </div>
+            </div> 
         </div>
     </div>
 </div>
@@ -237,6 +237,7 @@
                 </div>
                 <div class="modal-footer d-flex gap-2 justify-content-end align-items-center">
                     <button type="submit" class="btn btn-primary">Opslaan</button>
+                    <button type="submit" id="delete-match-btn" class="btn btn-danger">Wedstrijd verwijderen</button>
                 </div>
             </form>
         </div>
