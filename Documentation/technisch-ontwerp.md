@@ -18,36 +18,37 @@
 
 ## Inleiding
 
-*Schrijf hier een korte inleiding over het programma. Denk bijvoorbeeld aan de volgende punten:*
+Deze applicatie is gemaakt voor de opleiding Handhaving. Studenten van deze opleiding moeten stage lopen als beveiliger bij evenementen zoals sportwedstrijden. De applicatie is ontwikkeld om het aan- en afmelden voor deze wedstrijden te faciliteren, en om het beheer voor docenten (admins) eenvoudiger te maken.
 
--   Voor welk bedrijf wordt het programma gemaakt
--   Waarom wordt het programma gemaakt
--   Welke doelgroep gaat het programma gebruiken (klanten, medewerkers, Internetgebruikers, enzovoort)
--   Wat voor soort programma maak je (webapplicatie, desktopapplicatie, mobile app, enzovoort)
+- De applicatie is bedoeld voor onderwijsinstellingen met een handhavingsopleiding.
+- Het programma wordt gemaakt om het proces van stagetoewijzing en aanwezigheidsregistratie te verbeteren.
+- De doelgroep bestaat uit studenten en docenten van de opleiding.
+- De applicatie is een webapplicatie die toegankelijk is via internet.
 
 **Voorbeeld**
 
-Dit is het technische ontwerp voor het nieuwe administratieprogramma van Bakker Bartels. Deze applicatie gaat het bestaande desktop programma vervangen.
+Dit is het technische ontwerp voor een webapplicatie die studenten van de opleiding Handhaving ondersteunt bij het aan- en afmelden voor evenementenstages, zoals sportwedstrijden.
 
-De applicatie gaat gebruikt worden door de administratieafdeling van het bedrijf.
+De applicatie vervangt handmatige registratie en maakt het voor docenten eenvoudiger om deelname en aanwezigheid te beheren.
 
-Er wordt een webapplicatie gemaakt die ook op een mobiel goed te gebruiken moet zijn.
+De doelgroep bestaat uit studenten en docenten van handhavingsopleidingen.
+
+De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel desktop als mobiel.
 
 
 ## Functionaliteiten
 
+**Admins kunnen:**
 
+- Wedstrijden toevoegen, bewerken en verwijderen
+- Klassen (groepen) aanmaken, wijzigen en verwijderen
+- Studenten toevoegen, bewerken en verwijderen
 
-*Maak een lijst met de functionaliteiten uit het functioneel ontwerp of je opdracht.*
+**Studenten kunnen:**
 
-*Als er bijzonderheden zijn dan beschrijf je die ook.*
-
-**Voorbeeld**
-
--   Invoeren van nieuwe medewerkers
--   Wijzigen medewerkers
--   Verwijderen medewerkers
-    -   Bij het verwijderen van de medewerker wordt ook de pas geblokkeerd
+- Zich aanmelden voor wedstrijden
+- Zich afmelden voor wedstrijden
+- Wedstrijden ruilen met andere studenten
 
 
 ## Entiteit Relationship Diagram (ERD)
