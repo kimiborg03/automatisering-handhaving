@@ -112,12 +112,78 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 
 ## Oplevering
 
-*Beschrijf hier wat er gedaan moet worden om de applicatie op te leveren in een productieomgeving. De onderwerpen zijn per applicatie verschillend. Denk onder andere aan de volgende onderwerpen:*
 
--   Welke server wordt gebruikt, naam, versie, installatiestappen
--   Welke databaseserver wordt gebruikt, naam, versie, installatiestappen
--   Welke webserver wordt gebruikt
--   Welke ontwikkelplatform is gebruikt (PHP, .NET, JavaScript, enz.)
--   Welke framework is gebruikt (Laravel, ASP.NET, React, Angular, enz.)
--   Welke firewall is geïnstalleerd
--   Welke poorten zijn beschikbaar
+# ✅ Serverconfiguratie
+
+- **Webserver**: Apache
+- **PHP**: Versie 8.2 of hoger
+- **Node.js**: 18+
+- **Composer**: Versie 2.5+
+- **MySQL**: Versie 8.0+
+
+# ✅ Ontwikkelomgeving
+
+- **Frameworks**: Laravel, Blade, TailwindCSS
+- **Database**: MySQL
+- **Mail**: SMTP-instellingen configureerbaar via adminpaneel
+
+
+# Installatie-instructies
+
+ Om MySQL te installeren kun je het officiële stappenplan volgen via deze link:  
+[MySQL installatiehandleiding](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
+
+Volg de instructies op de pagina voor jouw besturingssysteem om MySQL correct te installeren.
+
+1. Open de terminal in de map `automatisering_handhaving`.
+2. Voer uit:  
+   ```
+   composer install
+   ```
+3. Wacht tot dit klaar is en voer uit:  
+   ```
+   npm install
+   ```
+4. Wacht tot dit klaar is en voer uit:  
+   ```
+   cp .env.example .env
+   ```
+5. Voer uit:  
+   ```
+   php artisan key:generate
+   ```
+   - Als je de melding krijgt:  
+     `The database 'automatisering_handhaving' does not exist on the 'mysql' connection. Would you like to create it? (yes/no) [yes]`  
+     Typ: `yes`
+6. Voer uit:  
+   ```
+   npm run build
+   ```
+7. Start de server:  
+   ```
+   php artisan serve
+   ```
+8. Maak een admin gebruiker aan:  
+   ```
+   php artisan db:seed
+   ```
+
+**Inloggegevens admin:**  
+- E-mail: `jan@example.com`  
+- Wachtwoord: `wachtwoord123`
+
+---
+
+**Optioneel:**  
+- Ga naar `/admin/users` om gebruikersinformatie van dit account aan te passen.  
+- Wachtwoord wijzigen kan op `/account`.
+
+---
+
+## 📧 Mailinstellingen
+
+1. Ga naar `admin/mail-settings` in het menu.
+2. Vul de mailgegevens in voor de server die de mails verstuurt (host, poort, gebruikersnaam, wachtwoord, afzender).
+3. Klik op Opslaan.
+
+Deze instellingen zijn nodig om e-mails te kunnen versturen (zoals registratie of wachtwoordherstel).
