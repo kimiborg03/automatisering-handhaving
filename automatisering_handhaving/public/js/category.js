@@ -11,6 +11,30 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log("Category:", category);
     console.log("CSRF Token:", csrfToken); // ✅ nu veilig
     // console.log("User ID:", userId);
+
+    function dutchDate(datetime) {
+        // Format date in Dutch and show local time in HH:MM, inclusief jaartal
+        const date = new Date(datetime);
+        const dagen = [
+            "Zondag", "Maandag", "Dinsdag", "Woensdag",
+            "Donderdag", "Vrijdag", "Zaterdag"
+        ];
+        const maanden = [
+            "Januari", "Februari", "Maart", "April", "Mei", "Juni",
+            "Juli", "Augustus", "September", "Oktober", "November", "December"
+        ];
+        const dagNaam = dagen[date.getDay()];
+        const dagNummer = date.getDate();
+        const maandNaam = maanden[date.getMonth()];
+        const jaar = date.getFullYear();
+        const tijdStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        return `${dagNaam} ${dagNummer} ${maandNaam} ${jaar} `;
+    }
+    function formatUtc(datetime) {
+        const date = new Date(datetime);
+        return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+    }
+
     document.getElementById('confirm-remove-deadline-btn').addEventListener('click', function () {
         if (!pendingDeadlineMatchId) return;
 
@@ -53,11 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Helper function to format UTC date/time
-    function formatUtc(datetime) {
-        const date = new Date(datetime);
-        return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
-    }
+    // Helper function to format Dutch date
+
 
     function loadMatches() {
         console.log('Loading matches... Offset:', offset, 'Category:', category);
@@ -98,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="info-box mb-2">
                                 <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
                                 <span class="info-label">Datum</span>
-                                <div class="info-value">${new Date(match.checkin_time).toLocaleDateString()}</div>
+                                <div class="info-value">${ dutchDate(match.checkin_time)}</div>
                             </div>
                             <div class="info-box mb-2">
                                 <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
@@ -108,12 +129,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="info-box mb-2">
                                 <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
                                 <span class="info-label">Check-in</span>
-                                <div class="info-value">${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div class="info-value">${ formatUtc(match.checkin_time)}</div>
                             </div>
                             <div class="info-box mb-2">
                                 <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
                                 <span class="info-label">Aftrap</span>
-                                <div class="info-value">${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div class="info-value">${formatUtc(match.kickoff_time)}</div>
                             </div>
                             <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal"
                                 data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
@@ -236,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="info-box mb-2">
                                 <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
                                 <span class="info-label">Datum</span>
-                                <div class="info-value">${new Date(match.checkin_time).toLocaleDateString()}</div>
+                                <div class="info-value">${dutchDate(match.checkin_time)}</div>
                             </div>
                             <div class="info-box mb-2">
                                 <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
@@ -246,12 +267,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="info-box mb-2">
                                 <i class="bi bi-door-open me-1 text-warning fs-5 align-middle"></i>
                                 <span class="info-label">Check-in</span>
-                                <div class="info-value">${new Date(match.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div class="info-value">${ formatUtc(match.checkin_time)}</div>
                             </div>
                             <div class="info-box mb-2">
                                 <i class="bi bi-play-fill me-1 text-danger fs-5 align-middle"></i>
                                 <span class="info-label">Aftrap</span>
-                                <div class="info-value">${new Date(match.kickoff_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div class="info-value">${formatUtc(match.kickoff_time)}</div>
                             </div>
                             <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal"
                                 data-bs-target="#matchModal" onclick='openMatchModal(${JSON.stringify(match)}, true)'>
@@ -556,7 +577,6 @@ function openMatchModal(match, showRuilButton) {
 
     let matchUsers = Array.isArray(match.users) ? match.users : JSON.parse(match.users);
     let numberOfUsers = matchUsers.length;
-
     function formatUtc(datetime) {
         const date = new Date(datetime);
         return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
@@ -578,7 +598,7 @@ let stringThing = `
     <div class="info-box mb-2">
         <i class="bi bi-calendar-event me-1 text-primary fs-5 align-middle"></i>
         <span class="info-label">Datum</span>
-        <div class="info-value">${formatDateOnly(match.checkin_time)}</div>
+        <div class="info-value">${dutchDate(match.checkin_time)}</div>
     </div>
     <div class="info-box mb-2">
         <i class="bi bi-geo-alt me-1 text-success fs-5 align-middle"></i>
@@ -945,3 +965,41 @@ function confirmUnsubscribe(matchId) {
             });
         }
     });
+
+
+function dutchDate(datetime) {
+    // Format date in Dutch and show local time in HH:MM, inclusief jaartal
+    const date = new Date(datetime);
+    const dagen = [
+        "Zondag", "Maandag", "Dinsdag", "Woensdag",
+        "Donderdag", "Vrijdag", "Zaterdag"
+    ];
+    const maanden = [
+        "Januari", "Februari", "Maart", "April", "Mei", "Juni",
+        "Juli", "Augustus", "September", "Oktober", "November", "December"
+    ];
+    const dagNaam = dagen[date.getDay()];
+    const dagNummer = date.getDate();
+    const maandNaam = maanden[date.getMonth()];
+    const jaar = date.getFullYear();
+    const tijdStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return `${dagNaam} ${dagNummer} ${maandNaam} ${jaar} `;
+}
+
+function formatDutchDate(dateInput) {
+    const dagen = [
+        "Zondag", "Maandag", "Dinsdag", "Woensdag",
+        "Donderdag", "Vrijdag", "Zaterdag"
+    ];f
+    const maanden = [
+        "Januari", "Februari", "Maart", "April", "Mei", "Juni",
+        "Juli", "Augustus", "September", "Oktober", "November", "December"
+    ];
+
+    const date = new Date(dateInput);
+    const dagNaam = dagen[date.getDay()];
+    const dagNummer = date.getDate();
+    const maandNaam = maanden[date.getMonth()];
+
+    return `${dagNaam} ${dagNummer} ${maandNaam}`;
+}

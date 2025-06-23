@@ -95,6 +95,8 @@ Er wordt een webapplicatie gemaakt die ook op een mobiel goed te gebruiken moet 
 
 
 
+
+
 ## Oplevering
 
 *Beschrijf hier wat er gedaan moet worden om de applicatie op te leveren in een productieomgeving. De onderwerpen zijn per applicatie verschillend. Denk onder andere aan de volgende onderwerpen:*
@@ -106,3 +108,10 @@ Er wordt een webapplicatie gemaakt die ook op een mobiel goed te gebruiken moet 
 -   Welke framework is gebruikt (Laravel, ASP.NET, React, Angular, enz.)
 -   Welke firewall is geïnstalleerd
 -   Welke poorten zijn beschikbaar
+
+
+
+
+
+
+
