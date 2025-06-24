@@ -1,4 +1,3 @@
-
 # Functioneel Ontwerp
 
 Beveiligingswedstrijden Applicatie
@@ -43,7 +42,7 @@ De applicatie kent twee rollen: **admin (docent)** en **student**.
 - Zich afmelden voor wedstrijden
 - Wedstrijden ruilen met andere studenten
 
-### User stories
+### Requirements
 
 - Als docent wil ik eenvoudig wedstrijden kunnen toevoegen, starttijden kunnen aanpassen en opmerkingen kunnen plaatsen.
 - Als student wil ik mij kunnen aanmelden voor een wedstrijd zodat ik weet waar ik stage loop.
@@ -54,7 +53,11 @@ De applicatie kent twee rollen: **admin (docent)** en **student**.
 
 De interface is ontworpen om eenvoudig en overzichtelijk te zijn, zowel voor studenten als admins.
 
-![User Interface](media/user_interface.png)
+### Wireframe home
+![Wireframe home](media/wireframehome.png)
+
+### Resultaat
+![Resultaat](media/user_interface.png)
 
 ###
 

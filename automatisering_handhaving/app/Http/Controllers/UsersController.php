@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Groups;
 use App\Models\Matches;
+use Carbon\Carbon;
 
 class UsersController extends Controller
 {
@@ -24,8 +25,27 @@ class UsersController extends Controller
             });
         }
 
+        // Haal alle users op (geen withCount, want we tellen handmatig)
         $users = $query->orderBy('id')->paginate(30);
         $groups = Groups::all();
+
+        // Tel gespeelde wedstrijden per user (presence = true en datum voorbij)
+$now = Carbon::now();
+foreach ($users as $user) {
+    $user->played_matches_count = Matches::where('kickoff_time', '<', $now)
+        ->get()
+        ->filter(function ($match) use ($user) {
+            $usersArr = json_decode($match->users, true) ?? [];
+            foreach ($usersArr as $u) {
+                if (
+                    (isset($u['user_id']) && $u['user_id'] == $user->id && !empty($u['presence']) && $u['presence'] === true)
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        })->count();
+}
 
         // Voor AJAX
         if ($request->ajax()) {
@@ -40,10 +60,10 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => [
-            'required',
-            'string',
-            'max:255',
-            Rule::unique('users')->ignore($id),
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users')->ignore($id),
             ],
             'email' => [
                 'required',

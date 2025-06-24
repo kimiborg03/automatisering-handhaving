@@ -37,6 +37,7 @@
                     <th>Klas</th>
                     <th>Rol</th>
                     <th>Toegang</th>
+                    <th>Gespeelde wedstrijden</th>
                 </tr>
             </thead>
             <tbody id="usersTable">

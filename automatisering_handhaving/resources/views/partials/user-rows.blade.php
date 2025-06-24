@@ -17,6 +17,7 @@
     </td>
     <td>{{ $user->role }}</td>
     <td>{{ $user->access }}</td>
+    <td>{{ $user->played_matches_count ?? 0 }}</td>
 </tr>
 
 @include('admin.users-modals')

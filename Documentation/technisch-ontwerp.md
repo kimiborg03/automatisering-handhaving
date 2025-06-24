@@ -5,113 +5,188 @@
 | Versie        |   |
 |---------------|---|
 | Datum         |   |
-| Naam          |   |
-| Studentnummer |   |
+| Naam          |Kimi Borg   |Appie Khalid
+| Studentnummer |158205      |174663
 
 # Inhoud
 1. [Inleiding](#inleiding)
 2. [Functionaliteiten](#functionaliteiten)
-3. [Klassendiagram](#klassendiagram)
-4. [Datamodel](#datamodel)
-5. [ERD](#entiteit-relationship-diagram-erd)
-6. [Data-Dictionary](#datadictionary)
-7. [Oplevering](#oplevering)
+3. [ERD](#entiteit-relationship-diagram-erd)
+4. [Data-Dictionary](#datadictionary)
+5. [Oplevering](#oplevering)
 
 
 ## Inleiding
 
-*Schrijf hier een korte inleiding over het programma. Denk bijvoorbeeld aan de volgende punten:*
+Deze applicatie is gemaakt voor de opleiding Handhaving. Studenten van deze opleiding moeten stage lopen als beveiliger bij evenementen zoals sportwedstrijden. De applicatie is ontwikkeld om het aan- en afmelden voor deze wedstrijden te faciliteren, en om het beheer voor docenten (admins) eenvoudiger te maken.
 
--   Voor welk bedrijf wordt het programma gemaakt
--   Waarom wordt het programma gemaakt
--   Welke doelgroep gaat het programma gebruiken (klanten, medewerkers, Internetgebruikers, enzovoort)
--   Wat voor soort programma maak je (webapplicatie, desktopapplicatie, mobile app, enzovoort
+- De applicatie is bedoeld voor onderwijsinstellingen met een handhavingsopleiding.
+- Het programma wordt gemaakt om het proces van stagetoewijzing en aanwezigheidsregistratie te verbeteren.
+- De doelgroep bestaat uit studenten en docenten van de opleiding.
+- De applicatie is een webapplicatie die toegankelijk is via internet.
 
 **Voorbeeld**
 
-Dit is het technische ontwerp voor het nieuwe administratieprogramma van Bakker Bartels. Deze applicatie gaat het bestaande desktop programma vervangen.
+Dit is het technische ontwerp voor een webapplicatie die studenten van de opleiding Handhaving ondersteunt bij het aan- en afmelden voor evenementenstages, zoals sportwedstrijden.
 
-De applicatie gaat gebruikt worden door de administratieafdeling van het bedrijf.
+De applicatie vervangt handmatige registratie en maakt het voor docenten eenvoudiger om deelname en aanwezigheid te beheren.
 
-Er wordt een webapplicatie gemaakt die ook op een mobiel goed te gebruiken moet zijn.
+De doelgroep bestaat uit studenten en docenten van handhavingsopleidingen.
+
+De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel desktop als mobiel.
 
 
 ## Functionaliteiten
 
+**Admins kunnen:**
 
+- Wedstrijden toevoegen, bewerken en verwijderen
+- Klassen (groepen) aanmaken, wijzigen en verwijderen
+- Studenten toevoegen, bewerken en verwijderen
 
-*Maak een lijst met de functionaliteiten uit het functioneel ontwerp of je opdracht.*
+**Studenten kunnen:**
 
-*Als er bijzonderheden zijn dan beschrijf je die ook.*
+- Zich aanmelden voor wedstrijden
+- Zich afmelden voor wedstrijden
+- Wedstrijden ruilen met andere studenten
 
-**Voorbeeld**
-
--   Invoeren van nieuwe medewerkers
--   Wijzigen medewerkers
--   Verwijderen medewerkers
-    -   Bij het verwijderen van de medewerker wordt ook de pas geblokkeerd
-
-
-
-## Klassendiagram
-
-*Hier beschrijf je hoe de klassen van je programma eruitzien en met elkaar samenhangen. Je kan dit doen met behulp van een diagram of door een beschrijving van de classes, de methods en eigenschappen.*
-
-**Voorbeeld**
-
-![](media/403bd536753639a02a425b458787ee21.png)
-
-
-# Datamodel
 
 ## Entiteit Relationship Diagram (ERD)
 
-
-
-*voeg hier een schema in van het datamodel. Maak voor elke tabel een blokje en geef met lijnen weer hoe de tabellen met elkaar verbonden zijn*
-
-**Voorbeeld**
-
-![](media/a52f9509fe92d6c9c4346ded67eed4cc.png)
-
-
+![](media/erd-automatiseringhandhaving.png)
 
 ## Datadictionary
 
-
-
 *Voeg hier een lijst in met per tabel een opsomming van de gebruikte kolommen. Per kolom geeft je weer: de naam, het datatype, de lengte, of het een sleutel is en zoja naar welke tabel.]*
 
-**Voorbeeld**
+| **users**     |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| username      | string       | 255*       |         |                  |
+| password      | string       | 255*       |         |                  |
+| email         | string       | 255*       |         |                  |
+| group_id      | unsignedBigInteger |      | Foreign | groups           |
+| role          | string       | 255*       |         |                  |
+| access        | boolean      |            |         |                  |
+| password_setup_token | string | 255*      |         |                  |
+| email_verified_at | timestamp |           |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
 
-| **medewerker** |              |            |         |                  |
-|----------------|--------------|------------|---------|------------------|
-| **Kolom**      | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
-| Id             | integer      |            | Primary |                  |
-| rol_id         | integer      |            | Foreign | Rollen           |
-| voornaam       | string       | 200        |         |                  |
-| achternaam     | string       | 200        |         |                  |
-| voorvoegsel    | string       | 20         |         |                  |
+
+| **matches**   |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| location      | string       | 255*       |         |                  |
+| checkin_time  | datetime     |            |         |                  |
+| kickoff_time  | datetime     |            |         |                  |
+| category      | string       | 255*       |         |                  |
+| comment       | text         |            |         |                  |
+| users         | json         |            |         |                  |
+| limit         | integer      |            |         |                  |
+| deadline      | string       | 255*       |         |                  |
+| groups        | json         |            |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
 
 
+| **groups**    |              |            |         |                  |
+|---------------|--------------|------------|---------|------------------|
+| **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| id            | integer      |            | Primary |                  |
+| name          | string       | 255*       |         |                  |
+| created_at    | timestamp    |            |         |                  |
+| updated_at    | timestamp    |            |         |                  |
+
+
+| **password_reset_tokens**|              |            |         |                  |
+|--------------------------|--------------|------------|---------|------------------|
+| **Kolom**                | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
+| email                    | string       | 255*       | Index   |                  |
+| token                    | string       | 255*       |         |                  |
+| created_at               | timestamp    |            |         |                  |
 
 
 
 ## Oplevering
 
-*Beschrijf hier wat er gedaan moet worden om de applicatie op te leveren in een productieomgeving. De onderwerpen zijn per applicatie verschillend. Denk onder andere aan de volgende onderwerpen:*
 
--   Welke server wordt gebruikt, naam, versie, installatiestappen
--   Welke databaseserver wordt gebruikt, naam, versie, installatiestappen
--   Welke webserver wordt gebruikt
--   Welke ontwikkelplatform is gebruikt (PHP, .NET, JavaScript, enz.)
--   Welke framework is gebruikt (Laravel, ASP.NET, React, Angular, enz.)
--   Welke firewall is geïnstalleerd
--   Welke poorten zijn beschikbaar
+=======
+# ✅ Serverconfiguratie
+
+- **Webserver**: Apache
+- **PHP**: Versie 8.2 of hoger
+- **Node.js**: 18+
+- **Composer**: Versie 2.5+
+- **MySQL**: Versie 8.0+
+
+# ✅ Ontwikkelomgeving
+
+- **Frameworks**: Laravel, Blade, TailwindCSS
+- **Database**: MySQL
+- **Mail**: SMTP-instellingen configureerbaar via adminpaneel
 
 
+# Installatie-instructies
 
+ Om MySQL te installeren kun je het officiële stappenplan volgen via deze link:  
+[MySQL installatiehandleiding](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
 
+Volg de instructies op de pagina voor jouw besturingssysteem om MySQL correct te installeren.
 
+1. Open de terminal in de map `automatisering_handhaving`.
+2. Voer uit:  
+   ```
+   composer install
+   ```
+3. Wacht tot dit klaar is en voer uit:  
+   ```
+   npm install
+   ```
+4. Wacht tot dit klaar is en voer uit:  
+   ```
+   cp .env.example .env
+   ```
+5. Voer uit:  
+   ```
+   php artisan key:generate
+   ```
+   - Als je de melding krijgt:  
+     `The database 'automatisering_handhaving' does not exist on the 'mysql' connection. Would you like to create it? (yes/no) [yes]`  
+     Typ: `yes`
+6. Voer uit:  
+   ```
+   npm run build
+   ```
+7. Start de server:  
+   ```
+   php artisan serve
+   ```
+8. Maak een admin gebruiker aan:  
+   ```
+   php artisan db:seed
+   ```
 
+**Inloggegevens admin:**  
+- E-mail: `jan@example.com`  
+- Wachtwoord: `wachtwoord123`
 
+---
+
+**Optioneel:**  
+- Ga naar `/admin/users` om gebruikersinformatie van dit account aan te passen.  
+- Wachtwoord wijzigen kan op `/account`.
+
+---
+
+## 📧 Mailinstellingen
+
+1. Ga naar `admin/mail-settings` in het menu.
+2. Vul de mailgegevens in voor de server die de mails verstuurt (host, poort, gebruikersnaam, wachtwoord, afzender).
+3. Klik op Opslaan.
+
+Deze instellingen zijn nodig om e-mails te kunnen versturen (zoals registratie of wachtwoordherstel).
