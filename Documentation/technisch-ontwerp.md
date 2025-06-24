@@ -59,6 +59,7 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 
 *Voeg hier een lijst in met per tabel een opsomming van de gebruikte kolommen. Per kolom geeft je weer: de naam, het datatype, de lengte, of het een sleutel is en zoja naar welke tabel.]*
 
+
 | **users**     |              |            |         |                  |
 |---------------|--------------|------------|---------|------------------|
 | **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
@@ -74,6 +75,7 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 | email_verified_at | timestamp |           |         |                  |
 | created_at    | timestamp    |            |         |                  |
 | updated_at    | timestamp    |            |         |                  |
+
 
 
 | **matches**   |              |            |         |                  |
@@ -94,6 +96,7 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 | updated_at    | timestamp    |            |         |                  |
 
 
+
 | **groups**    |              |            |         |                  |
 |---------------|--------------|------------|---------|------------------|
 | **Kolom**     | **Datatype** | **Lengte** | **Key** | **Relatie naar** |
@@ -101,6 +104,7 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 | name          | string       | 255*       |         |                  |
 | created_at    | timestamp    |            |         |                  |
 | updated_at    | timestamp    |            |         |                  |
+
 
 
 | **password_reset_tokens**|              |            |         |                  |

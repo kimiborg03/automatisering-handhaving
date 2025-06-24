@@ -5,14 +5,14 @@ Deze applicatie is ontwikkeld om het proces van automatisering en handhaving te 
 
 ## Homepagina
 - Op de homepagina vind je onder het kopje 'Ingeschreven wedstrijden' een overzicht van alle wedstrijden waar je voor staat ingeschreven.
-- Onder het kopje gespeelde wedstrijden vindt je wedstrijden waarbij de datum geweest is en een admin je aanwezig heeft gemeld
+- Onder het kopje gespeelde wedstrijden vindt je wedstrijden waarbij de datum geweest is en een admin je aanwezig heeft gemeldt.
 
-Wanneer je op een wedstrijd klikt krijg je een overzicht met meer informatie over de wedstrijd. Als gebruiker krijg je de de volgende opties
+Wanneer je op een wedstrijd klikt krijg je een overzicht met meer informatie over de wedstrijd. Als gebruiker krijg je de de volgende opties:
 - ruilen
 - aanmelden
 - afmelden (alleen wanneer je voor meer dan 10 wedstrijden staat)
 
-Als admin kun je het volgende
+Als admin kun je het volgende:
 - deadline sluiten (zorgt dat niemand zich meer mag aanmelden)
 - deadline openen ( Voor als je aanmeldingen weer wilt toestaan)
 - Alle deelnemers bekijken ( Opent een pagina met iedereen die zich heeft aangemeldt, met de optie om de lijst als Excel te downloaden en om de aanwezigheid van gebruikers te vinken)
