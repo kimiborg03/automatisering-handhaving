@@ -110,9 +110,12 @@ De applicatie is via internet toegankelijk en geschikt voor gebruik op zowel des
 | token                    | string       | 255*       |         |                  |
 | created_at               | timestamp    |            |         |                  |
 
+
+
 ## Oplevering
 
 
+=======
 # ✅ Serverconfiguratie
 
 - **Webserver**: Apache

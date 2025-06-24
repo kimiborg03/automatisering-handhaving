@@ -7,6 +7,8 @@ Beveiligingswedstrijden Applicatie
 | Datum         | [vul in] |
 | Naam          | [Appie Khalid] |
 | Studentnummer | [174663] |
+| Naam          | [Appie Khalid] |
+| Studentnummer | [174663] |
 
 # Inhoud
 
