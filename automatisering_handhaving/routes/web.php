@@ -16,6 +16,11 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\AccountController;
 use App\Mail\RegisterMail;
 use App\Http\Controllers\PasswordSetupController;
+
+Route::get('/', function () {
+    return redirect('/home');
+});
+
 // Login routes
 Route::get('/login', function () {
     return view('login');
